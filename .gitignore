@@ -1,0 +1,15 @@
+.DS_Store
+.vscode/
+.derivedData/
+
+# .NET
+**/bin/
+**/obj/
+
+# Xcode
+*.xcuserstate
+xcuserdata/
+
+# Local env
+.env
+.env.*

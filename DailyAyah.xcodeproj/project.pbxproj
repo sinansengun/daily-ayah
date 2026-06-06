@@ -1,0 +1,513 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0F783D47F10D757658058C46 /* DailyAyahWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B0D64E0666254304A68D6420 /* DailyAyahWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		11AF6CE48C17697E73C010DA /* DailyAyahWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8168A115746F3E3151822B3 /* DailyAyahWidgetView.swift */; };
+		1932EBE5D9816B2235276F1D /* AppGroupConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185486214C6A22FFC774BA59 /* AppGroupConfig.swift */; };
+		1D1FBC04DAD129C8FC8D2AF7 /* DailyAyahClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB1F7A776FFC4C810BCC9DB /* DailyAyahClient.swift */; };
+		3E2106A2BF289EBA96104EBA /* DailyAyahTimelineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B1C00BD1C11517E119EDCB /* DailyAyahTimelineProvider.swift */; };
+		488FE8FF8CF5E919CBFAB895 /* DailyAyah.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3693E235C3CC522B8FCC823E /* DailyAyah.swift */; };
+		63E34F37AAE48B366FA1E194 /* DailyAyah.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3693E235C3CC522B8FCC823E /* DailyAyah.swift */; };
+		78E07FFA26E13298F5874CCB /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19C4FD019A76F2619537BF8 /* APIConfig.swift */; };
+		79028C6B3EB3349FD404D4D0 /* DailyAyahRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB9952C8D6C05E75563F2D1 /* DailyAyahRepository.swift */; };
+		8FB6ADE537F30FD6AB1C2D5C /* SharedDailyAyahStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3EB6D78F8F7F1FBF14D8A8B /* SharedDailyAyahStore.swift */; };
+		AF5C78684B9AA500007EB596 /* DailyAyahRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB9952C8D6C05E75563F2D1 /* DailyAyahRepository.swift */; };
+		AFC2DADE8ED84177800DFE8A /* DailyAyahClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB1F7A776FFC4C810BCC9DB /* DailyAyahClient.swift */; };
+		B52C0FEE33EE66DA133704EA /* AppGroupConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185486214C6A22FFC774BA59 /* AppGroupConfig.swift */; };
+		B78057AAED8248A66827A8E9 /* DailyAyahApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D59D221D0807AB6511F2817 /* DailyAyahApp.swift */; };
+		D0C25578EBE74EFB92CDE5C1 /* DailyAyahWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229E0A7EFE40D57FB323369C /* DailyAyahWidget.swift */; };
+		D1A8278D26197429682878A1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D51652D8B47BF24FF3A65802 /* ContentView.swift */; };
+		D373035C3666821F1962F4A2 /* SharedDailyAyahStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3EB6D78F8F7F1FBF14D8A8B /* SharedDailyAyahStore.swift */; };
+		F4DDE6254A507793D89C505F /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19C4FD019A76F2619537BF8 /* APIConfig.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C8FE0D5599DEA1F2E6E434E4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FE3116AB86E7AB1633EFCFB9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 86E4E799C27C8E383BA0FBD8;
+			remoteInfo = DailyAyahWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B31E97E1DF5481EA024831A6 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				0F783D47F10D757658058C46 /* DailyAyahWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0E2F5C7478D82A7C1EB8506B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		13684C25B80866A4A2447895 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		185486214C6A22FFC774BA59 /* AppGroupConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupConfig.swift; sourceTree = "<group>"; };
+		229E0A7EFE40D57FB323369C /* DailyAyahWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahWidget.swift; sourceTree = "<group>"; };
+		2EB9952C8D6C05E75563F2D1 /* DailyAyahRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahRepository.swift; sourceTree = "<group>"; };
+		3693E235C3CC522B8FCC823E /* DailyAyah.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyah.swift; sourceTree = "<group>"; };
+		8D59D221D0807AB6511F2817 /* DailyAyahApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahApp.swift; sourceTree = "<group>"; };
+		AAB1F7A776FFC4C810BCC9DB /* DailyAyahClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahClient.swift; sourceTree = "<group>"; };
+		B0D64E0666254304A68D6420 /* DailyAyahWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DailyAyahWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8168A115746F3E3151822B3 /* DailyAyahWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahWidgetView.swift; sourceTree = "<group>"; };
+		D3EB6D78F8F7F1FBF14D8A8B /* SharedDailyAyahStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedDailyAyahStore.swift; sourceTree = "<group>"; };
+		D51652D8B47BF24FF3A65802 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E7B1C00BD1C11517E119EDCB /* DailyAyahTimelineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahTimelineProvider.swift; sourceTree = "<group>"; };
+		EA23B2C9340EFB40D96CC08B /* DailyAyahApp.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DailyAyahApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F19C4FD019A76F2619537BF8 /* APIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		01F5A260743FDB4F5949E603 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				F19C4FD019A76F2619537BF8 /* APIConfig.swift */,
+				185486214C6A22FFC774BA59 /* AppGroupConfig.swift */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		029FC82AE43C3A197816B71B /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				AFC72BA3179E40D9917319A4 /* App */,
+				BA400771D00F6D8A24FDD69C /* Widget */,
+			);
+			path = ios;
+			sourceTree = "<group>";
+		};
+		402890A44972B882CC5ED09C /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				3693E235C3CC522B8FCC823E /* DailyAyah.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		694147B5CCDCA9523DA5D1F7 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				D3EB6D78F8F7F1FBF14D8A8B /* SharedDailyAyahStore.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		8B8A05839CD27317B82884F4 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				AAB1F7A776FFC4C810BCC9DB /* DailyAyahClient.swift */,
+				2EB9952C8D6C05E75563F2D1 /* DailyAyahRepository.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		AFC72BA3179E40D9917319A4 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				D51652D8B47BF24FF3A65802 /* ContentView.swift */,
+				8D59D221D0807AB6511F2817 /* DailyAyahApp.swift */,
+				0E2F5C7478D82A7C1EB8506B /* Info.plist */,
+				01F5A260743FDB4F5949E603 /* Config */,
+				402890A44972B882CC5ED09C /* Models */,
+				8B8A05839CD27317B82884F4 /* Services */,
+				694147B5CCDCA9523DA5D1F7 /* Storage */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		BA400771D00F6D8A24FDD69C /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				E7B1C00BD1C11517E119EDCB /* DailyAyahTimelineProvider.swift */,
+				229E0A7EFE40D57FB323369C /* DailyAyahWidget.swift */,
+				B8168A115746F3E3151822B3 /* DailyAyahWidgetView.swift */,
+				13684C25B80866A4A2447895 /* Info.plist */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+		CDDA22967036AED95E8D9784 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EA23B2C9340EFB40D96CC08B /* DailyAyahApp.app */,
+				B0D64E0666254304A68D6420 /* DailyAyahWidgetExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CE2CC67AD8889403937C3FFA = {
+			isa = PBXGroup;
+			children = (
+				029FC82AE43C3A197816B71B /* ios */,
+				CDDA22967036AED95E8D9784 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		86E4E799C27C8E383BA0FBD8 /* DailyAyahWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E24C2A0CB39375804A5B8295 /* Build configuration list for PBXNativeTarget "DailyAyahWidgetExtension" */;
+			buildPhases = (
+				A89092856FD232C7D9E2B8A2 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DailyAyahWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = DailyAyahWidgetExtension;
+			productReference = B0D64E0666254304A68D6420 /* DailyAyahWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		B195145AA04CCE0C46A49DC4 /* DailyAyahApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0F142A814EFBC3E801B20C3C /* Build configuration list for PBXNativeTarget "DailyAyahApp" */;
+			buildPhases = (
+				380D3C480A7A925FFFA8B98C /* Sources */,
+				B31E97E1DF5481EA024831A6 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8B7566DB1BB01B4350C5DA82 /* PBXTargetDependency */,
+			);
+			name = DailyAyahApp;
+			packageProductDependencies = (
+			);
+			productName = DailyAyahApp;
+			productReference = EA23B2C9340EFB40D96CC08B /* DailyAyahApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FE3116AB86E7AB1633EFCFB9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					86E4E799C27C8E383BA0FBD8 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					B195145AA04CCE0C46A49DC4 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 2B20BE603059B46D6AC40702 /* Build configuration list for PBXProject "DailyAyah" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CE2CC67AD8889403937C3FFA;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = CDDA22967036AED95E8D9784 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B195145AA04CCE0C46A49DC4 /* DailyAyahApp */,
+				86E4E799C27C8E383BA0FBD8 /* DailyAyahWidgetExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		380D3C480A7A925FFFA8B98C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				78E07FFA26E13298F5874CCB /* APIConfig.swift in Sources */,
+				1932EBE5D9816B2235276F1D /* AppGroupConfig.swift in Sources */,
+				D1A8278D26197429682878A1 /* ContentView.swift in Sources */,
+				488FE8FF8CF5E919CBFAB895 /* DailyAyah.swift in Sources */,
+				B78057AAED8248A66827A8E9 /* DailyAyahApp.swift in Sources */,
+				1D1FBC04DAD129C8FC8D2AF7 /* DailyAyahClient.swift in Sources */,
+				79028C6B3EB3349FD404D4D0 /* DailyAyahRepository.swift in Sources */,
+				8FB6ADE537F30FD6AB1C2D5C /* SharedDailyAyahStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A89092856FD232C7D9E2B8A2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F4DDE6254A507793D89C505F /* APIConfig.swift in Sources */,
+				B52C0FEE33EE66DA133704EA /* AppGroupConfig.swift in Sources */,
+				63E34F37AAE48B366FA1E194 /* DailyAyah.swift in Sources */,
+				AFC2DADE8ED84177800DFE8A /* DailyAyahClient.swift in Sources */,
+				AF5C78684B9AA500007EB596 /* DailyAyahRepository.swift in Sources */,
+				3E2106A2BF289EBA96104EBA /* DailyAyahTimelineProvider.swift in Sources */,
+				D0C25578EBE74EFB92CDE5C1 /* DailyAyahWidget.swift in Sources */,
+				11AF6CE48C17697E73C010DA /* DailyAyahWidgetView.swift in Sources */,
+				D373035C3666821F1962F4A2 /* SharedDailyAyahStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8B7566DB1BB01B4350C5DA82 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 86E4E799C27C8E383BA0FBD8 /* DailyAyahWidgetExtension */;
+			targetProxy = C8FE0D5599DEA1F2E6E434E4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		34335476CFE15FBE98342192 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		5093892B4B49B72992AE02C2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = ios/App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.dailyayah.app;
+				PRODUCT_NAME = DailyAyah;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		55D8A7EF0B739E857FC96BFA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		B0892A740B2B07F3F4D05DCF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = ios/App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.dailyayah.app;
+				PRODUCT_NAME = DailyAyah;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BDAD5C584DDFDFBDF1C8649F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = ios/Widget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.dailyayah.app.widget;
+				PRODUCT_NAME = DailyAyahWidgetExtension;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E1914EAC6C303C784A7CDE73 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = ios/Widget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.dailyayah.app.widget;
+				PRODUCT_NAME = DailyAyahWidgetExtension;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0F142A814EFBC3E801B20C3C /* Build configuration list for PBXNativeTarget "DailyAyahApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B0892A740B2B07F3F4D05DCF /* Debug */,
+				5093892B4B49B72992AE02C2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		2B20BE603059B46D6AC40702 /* Build configuration list for PBXProject "DailyAyah" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				34335476CFE15FBE98342192 /* Debug */,
+				55D8A7EF0B739E857FC96BFA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E24C2A0CB39375804A5B8295 /* Build configuration list for PBXNativeTarget "DailyAyahWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E1914EAC6C303C784A7CDE73 /* Debug */,
+				BDAD5C584DDFDFBDF1C8649F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FE3116AB86E7AB1633EFCFB9 /* Project object */;
+}

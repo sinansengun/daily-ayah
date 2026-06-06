@@ -1,0 +1,44 @@
+name: DailyAyah
+options:
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: 5.0
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    CURRENT_PROJECT_VERSION: 1
+    MARKETING_VERSION: 1.0
+
+targets:
+  DailyAyahApp:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: ios/App
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.dailyayah.app
+        PRODUCT_NAME: DailyAyah
+        INFOPLIST_FILE: ios/App/Info.plist
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+    dependencies:
+      - target: DailyAyahWidgetExtension
+
+  DailyAyahWidgetExtension:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: ios/Widget
+      - path: ios/App/Config
+      - path: ios/App/Models
+      - path: ios/App/Services
+      - path: ios/App/Storage
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.dailyayah.app.widget
+        PRODUCT_NAME: DailyAyahWidgetExtension
+        INFOPLIST_FILE: ios/Widget/Info.plist
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
