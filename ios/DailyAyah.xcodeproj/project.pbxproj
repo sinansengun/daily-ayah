@@ -61,12 +61,12 @@
 		74554DC5E5E3ABEB6C015FF5 /* DailyAyahRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahRepository.swift; sourceTree = "<group>"; };
 		9762890E56152A73D97FCA28 /* DailyAyahWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahWidgetView.swift; sourceTree = "<group>"; };
 		A47673FB3E2E8EDEFBA62734 /* DailyAyah.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyah.swift; sourceTree = "<group>"; };
-		B0D64E0666254304A68D6420 /* DailyAyahWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DailyAyahWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B0D64E0666254304A68D6420 /* DailyAyahWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DailyAyahWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9C136D7F229B6C9966C5D4B /* AppGroupConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupConfig.swift; sourceTree = "<group>"; };
 		D878CD6F6D1700CB8763291A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E287C5161C937FDEAD9808B7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E4E6AC3A24F71871340A3EE6 /* DailyAyahWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahWidget.swift; sourceTree = "<group>"; };
-		EA23B2C9340EFB40D96CC08B /* DailyAyahApp.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DailyAyahApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA23B2C9340EFB40D96CC08B /* DailyAyah.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DailyAyah.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0C61A38498B822F075612F9 /* DailyAyahClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahClient.swift; sourceTree = "<group>"; };
 		F105E085648D313F28AE64F7 /* DailyAyahTimelineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahTimelineProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -112,7 +112,7 @@
 		CDDA22967036AED95E8D9784 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				EA23B2C9340EFB40D96CC08B /* DailyAyahApp.app */,
+				EA23B2C9340EFB40D96CC08B /* DailyAyah.app */,
 				B0D64E0666254304A68D6420 /* DailyAyahWidgetExtension.appex */,
 			);
 			name = Products;
@@ -187,7 +187,7 @@
 			packageProductDependencies = (
 			);
 			productName = DailyAyahApp;
-			productReference = EA23B2C9340EFB40D96CC08B /* DailyAyahApp.app */;
+			productReference = EA23B2C9340EFB40D96CC08B /* DailyAyah.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -200,11 +200,9 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					86E4E799C27C8E383BA0FBD8 = {
-						DevelopmentTeam = JG5Z7XV88C;
 						ProvisioningStyle = Automatic;
 					};
 					B195145AA04CCE0C46A49DC4 = {
-						DevelopmentTeam = JG5Z7XV88C;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -354,7 +352,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JG5Z7XV88C;
+				DEVELOPMENT_TEAM = P6FX9URFQ2;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -432,7 +430,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JG5Z7XV88C;
+				DEVELOPMENT_TEAM = P6FX9URFQ2;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -450,7 +448,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JG5Z7XV88C;
+				DEVELOPMENT_TEAM = P6FX9URFQ2;
 				INFOPLIST_FILE = Widget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -469,7 +467,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JG5Z7XV88C;
+				DEVELOPMENT_TEAM = P6FX9URFQ2;
 				INFOPLIST_FILE = Widget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
