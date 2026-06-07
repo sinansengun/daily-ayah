@@ -55,25 +55,22 @@ public sealed class DiyanetScraper(HttpClient httpClient) : IDiyanetScraper
 
     private static bool TryParseFromAyetBlock(HtmlDocument document, out ScrapedAyah parsed)
     {
-        var ayetBox = document.DocumentNode.SelectSingleNode(
-            "//div[contains(@class,'ayet-hadis-dua')]//div[contains(@class,'ahd-boxes')][.//div[contains(@class,'ayet')]]"
-        );
-
-        if (ayetBox is null)
+        var ahdContainer = document.DocumentNode.SelectSingleNode("//div[contains(@class,'ayet-hadis-dua')]");
+        if (ahdContainer is null)
         {
             parsed = default!;
             return false;
         }
 
-        var ayah = ParseAhdSection(ayetBox, "ayet");
+        var ayah = ParseAhdSection(ahdContainer, "ayet");
         if (ayah is null || string.IsNullOrWhiteSpace(ayah.Value.Reference))
         {
             parsed = default!;
             return false;
         }
 
-        var hadis = ParseAhdSection(ayetBox, "hadis");
-        var dua = ParseAhdSection(ayetBox, "dua");
+        var hadis = ParseAhdSection(ahdContainer, "hadis");
+        var dua = ParseAhdSection(ahdContainer, "dua");
 
         parsed = new ScrapedAyah(
             ayah.Value.Text,
@@ -143,14 +140,22 @@ public sealed class DiyanetScraper(HttpClient httpClient) : IDiyanetScraper
 
     private static (string Text, string? Reference)? ParseAhdSection(HtmlNode container, string sectionClass)
     {
-        var sectionNode = container.SelectSingleNode($".//div[contains(@class,'{sectionClass}')]");
+        var boxNode = container.SelectSingleNode(
+            $".//div[contains(@class,'ahd-boxes')][.//div[contains(@class,'{sectionClass}')]]"
+        );
+        if (boxNode is null)
+        {
+            return null;
+        }
+
+        var sectionNode = boxNode.SelectSingleNode($".//div[contains(@class,'{sectionClass}')]");
         if (sectionNode is null)
         {
             return null;
         }
 
         var textNode = sectionNode.SelectSingleNode(".//p[contains(@class,'ahd-content-text')]");
-        var referenceNode = sectionNode.SelectSingleNode(".//div[contains(@class,'aht-bottom')]//p[contains(@class,'alt-sure-title')]");
+        var referenceNode = boxNode.SelectSingleNode(".//div[contains(@class,'aht-bottom')]//p[contains(@class,'alt-sure-title')]");
 
         var text = NormalizeText(textNode?.InnerText ?? string.Empty);
         if (string.IsNullOrWhiteSpace(text))
