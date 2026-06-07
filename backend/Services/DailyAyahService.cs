@@ -126,11 +126,15 @@ public sealed class DailyAyahService
     {
         var publishedDateTR = GetTurkeyDateIso(nowUtc);
         var fetchedAt = nowUtc.UtcDateTime.ToString("O", CultureInfo.InvariantCulture);
-        var fingerprint = $"{scraped.Text}|{scraped.Reference}|{publishedDateTR}";
+        var fingerprint = $"{scraped.Text}|{scraped.Reference}|{scraped.HadithText ?? string.Empty}|{scraped.HadithReference ?? string.Empty}|{scraped.DuaText ?? string.Empty}|{scraped.DuaReference ?? string.Empty}|{publishedDateTR}";
 
         return new DailyAyahRecord(
             scraped.Text,
             scraped.Reference,
+            scraped.HadithText,
+            scraped.HadithReference,
+            scraped.DuaText,
+            scraped.DuaReference,
             AppConstants.DefaultSource,
             publishedDateTR,
             fetchedAt,
@@ -160,6 +164,10 @@ public sealed class DailyAyahService
         return new DailyAyahApiResponse(
             record.Text,
             record.Reference,
+            record.HadithText,
+            record.HadithReference,
+            record.DuaText,
+            record.DuaReference,
             record.Source,
             record.PublishedDateTR,
             record.FetchedAt,

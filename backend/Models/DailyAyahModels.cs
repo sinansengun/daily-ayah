@@ -1,10 +1,21 @@
 namespace DailyAyah.Api.Models;
 
-public sealed record ScrapedAyah(string Text, string Reference);
+public sealed record ScrapedAyah(
+    string Text,
+    string Reference,
+    string? HadithText,
+    string? HadithReference,
+    string? DuaText,
+    string? DuaReference
+);
 
 public sealed record DailyAyahRecord(
     string Text,
     string Reference,
+    string? HadithText,
+    string? HadithReference,
+    string? DuaText,
+    string? DuaReference,
     string Source,
     string PublishedDateTR,
     string FetchedAt,
@@ -14,6 +25,10 @@ public sealed record DailyAyahRecord(
 public sealed record DailyAyahApiResponse(
     string Text,
     string Reference,
+    string? HadithText,
+    string? HadithReference,
+    string? DuaText,
+    string? DuaReference,
     string Source,
     string PublishedDateTR,
     string FetchedAt,

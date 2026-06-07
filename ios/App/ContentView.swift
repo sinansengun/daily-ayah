@@ -23,39 +23,61 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 16) {
-                if isLoading {
-                    ProgressView("Yukleniyor...")
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    if isLoading {
+                        ProgressView("Yukleniyor...")
+                    }
+
+                    if let ayah {
+                        contentCard(title: "Gunun Ayeti", text: ayah.text, reference: ayah.reference)
+
+                        if let hadithText = ayah.hadithText, !hadithText.isEmpty {
+                            contentCard(title: "Gunun Hadisi", text: hadithText, reference: ayah.hadithReference)
+                        }
+
+                        if let duaText = ayah.duaText, !duaText.isEmpty {
+                            contentCard(title: "Gunun Duasi", text: duaText, reference: ayah.duaReference)
+                        }
+
+                        Text("Tarih: \(formattedDate(from: ayah.publishedDateTR))")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("Henuz icerik yok")
+                            .foregroundStyle(.secondary)
+                    }
+
+                    if let errorMessage {
+                        Text(errorMessage)
+                            .font(.footnote)
+                            .foregroundStyle(.red)
+                    }
                 }
-
-                if let ayah {
-                    Text(ayah.text)
-                        .font(.body)
-
-                    Text(ayah.reference)
-                        .font(.headline)
-
-                    Text("Tarih: \(formattedDate(from: ayah.publishedDateTR))")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text("Henuz icerik yok")
-                        .foregroundStyle(.secondary)
-                }
-
-                if let errorMessage {
-                    Text(errorMessage)
-                        .font(.footnote)
-                        .foregroundStyle(.red)
-                }
-
-                Spacer()
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding()
-            .navigationTitle("Günün Ayeti")
+            .navigationTitle("Gunun Icerikleri")
         }
         .task {
             await refresh()
+        }
+    }
+
+    @ViewBuilder
+    private func contentCard(title: String, text: String, reference: String?) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.headline)
+
+            Text(text)
+                .font(.body)
+
+            if let reference, !reference.isEmpty {
+                Text(reference)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 

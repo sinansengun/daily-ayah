@@ -65,25 +65,24 @@ public sealed class DiyanetScraper(HttpClient httpClient) : IDiyanetScraper
             return false;
         }
 
-        var verseNode = ayetBox.SelectSingleNode(".//div[contains(@class,'ayet')]//p[contains(@class,'ahd-content-text')]");
-        var referenceNode = ayetBox.SelectSingleNode(".//div[contains(@class,'aht-bottom')]//p[contains(@class,'alt-sure-title')]");
-
-        var verse = NormalizeText(verseNode?.InnerText ?? string.Empty);
-        var referenceRaw = NormalizeText(referenceNode?.InnerText ?? string.Empty);
-        var reference = ExtractReference(referenceRaw);
-
-        if (string.IsNullOrWhiteSpace(reference))
-        {
-            reference = NormalizeText(referenceRaw.Trim('(', ')'));
-        }
-
-        if (string.IsNullOrWhiteSpace(verse) || string.IsNullOrWhiteSpace(reference))
+        var ayah = ParseAhdSection(ayetBox, "ayet");
+        if (ayah is null || string.IsNullOrWhiteSpace(ayah.Value.Reference))
         {
             parsed = default!;
             return false;
         }
 
-        parsed = new ScrapedAyah(verse, reference);
+        var hadis = ParseAhdSection(ayetBox, "hadis");
+        var dua = ParseAhdSection(ayetBox, "dua");
+
+        parsed = new ScrapedAyah(
+            ayah.Value.Text,
+            ayah.Value.Reference!,
+            hadis?.Text,
+            hadis?.Reference,
+            dua?.Text,
+            dua?.Reference
+        );
         return true;
     }
 
@@ -138,8 +137,40 @@ public sealed class DiyanetScraper(HttpClient httpClient) : IDiyanetScraper
             return false;
         }
 
-        parsed = new ScrapedAyah(verse, reference);
+        parsed = new ScrapedAyah(verse, reference, null, null, null, null);
         return true;
+    }
+
+    private static (string Text, string? Reference)? ParseAhdSection(HtmlNode container, string sectionClass)
+    {
+        var sectionNode = container.SelectSingleNode($".//div[contains(@class,'{sectionClass}')]");
+        if (sectionNode is null)
+        {
+            return null;
+        }
+
+        var textNode = sectionNode.SelectSingleNode(".//p[contains(@class,'ahd-content-text')]");
+        var referenceNode = sectionNode.SelectSingleNode(".//div[contains(@class,'aht-bottom')]//p[contains(@class,'alt-sure-title')]");
+
+        var text = NormalizeText(textNode?.InnerText ?? string.Empty);
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return null;
+        }
+
+        var referenceRaw = NormalizeText(referenceNode?.InnerText ?? string.Empty);
+        var reference = ExtractReference(referenceRaw);
+        if (string.IsNullOrWhiteSpace(reference))
+        {
+            reference = NormalizeText(referenceRaw.Trim('(', ')'));
+        }
+
+        if (string.IsNullOrWhiteSpace(reference))
+        {
+            reference = null;
+        }
+
+        return (text, reference);
     }
 
     private static string NormalizeText(string value)
