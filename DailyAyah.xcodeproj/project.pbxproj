@@ -24,6 +24,7 @@
 		D0C25578EBE74EFB92CDE5C1 /* DailyAyahWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229E0A7EFE40D57FB323369C /* DailyAyahWidget.swift */; };
 		D1A8278D26197429682878A1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D51652D8B47BF24FF3A65802 /* ContentView.swift */; };
 		D373035C3666821F1962F4A2 /* SharedDailyAyahStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3EB6D78F8F7F1FBF14D8A8B /* SharedDailyAyahStore.swift */; };
+		E939B404369EF1BDB34745CE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 36EECD46B99A481126441732 /* Assets.xcassets */; };
 		F4DDE6254A507793D89C505F /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19C4FD019A76F2619537BF8 /* APIConfig.swift */; };
 /* End PBXBuildFile section */
 
@@ -58,14 +59,15 @@
 		229E0A7EFE40D57FB323369C /* DailyAyahWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahWidget.swift; sourceTree = "<group>"; };
 		2EB9952C8D6C05E75563F2D1 /* DailyAyahRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahRepository.swift; sourceTree = "<group>"; };
 		3693E235C3CC522B8FCC823E /* DailyAyah.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyah.swift; sourceTree = "<group>"; };
+		36EECD46B99A481126441732 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8D59D221D0807AB6511F2817 /* DailyAyahApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahApp.swift; sourceTree = "<group>"; };
 		AAB1F7A776FFC4C810BCC9DB /* DailyAyahClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahClient.swift; sourceTree = "<group>"; };
-		B0D64E0666254304A68D6420 /* DailyAyahWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DailyAyahWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B0D64E0666254304A68D6420 /* DailyAyahWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DailyAyahWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8168A115746F3E3151822B3 /* DailyAyahWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahWidgetView.swift; sourceTree = "<group>"; };
 		D3EB6D78F8F7F1FBF14D8A8B /* SharedDailyAyahStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedDailyAyahStore.swift; sourceTree = "<group>"; };
 		D51652D8B47BF24FF3A65802 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E7B1C00BD1C11517E119EDCB /* DailyAyahTimelineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahTimelineProvider.swift; sourceTree = "<group>"; };
-		EA23B2C9340EFB40D96CC08B /* DailyAyahApp.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DailyAyahApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA23B2C9340EFB40D96CC08B /* DailyAyah.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DailyAyah.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F19C4FD019A76F2619537BF8 /* APIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -116,6 +118,7 @@
 		AFC72BA3179E40D9917319A4 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				36EECD46B99A481126441732 /* Assets.xcassets */,
 				D51652D8B47BF24FF3A65802 /* ContentView.swift */,
 				8D59D221D0807AB6511F2817 /* DailyAyahApp.swift */,
 				0E2F5C7478D82A7C1EB8506B /* Info.plist */,
@@ -141,7 +144,7 @@
 		CDDA22967036AED95E8D9784 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				EA23B2C9340EFB40D96CC08B /* DailyAyahApp.app */,
+				EA23B2C9340EFB40D96CC08B /* DailyAyah.app */,
 				B0D64E0666254304A68D6420 /* DailyAyahWidgetExtension.appex */,
 			);
 			name = Products;
@@ -180,6 +183,7 @@
 			buildConfigurationList = 0F142A814EFBC3E801B20C3C /* Build configuration list for PBXNativeTarget "DailyAyahApp" */;
 			buildPhases = (
 				380D3C480A7A925FFFA8B98C /* Sources */,
+				1FB7519731BDEF0599D8851A /* Resources */,
 				B31E97E1DF5481EA024831A6 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
@@ -191,7 +195,7 @@
 			packageProductDependencies = (
 			);
 			productName = DailyAyahApp;
-			productReference = EA23B2C9340EFB40D96CC08B /* DailyAyahApp.app */;
+			productReference = EA23B2C9340EFB40D96CC08B /* DailyAyah.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -204,11 +208,9 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					86E4E799C27C8E383BA0FBD8 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 					B195145AA04CCE0C46A49DC4 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -232,6 +234,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1FB7519731BDEF0599D8851A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E939B404369EF1BDB34745CE /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		380D3C480A7A925FFFA8B98C /* Sources */ = {
@@ -347,7 +360,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = P6FX9URFQ2;
 				INFOPLIST_FILE = ios/App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -425,7 +438,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = P6FX9URFQ2;
 				INFOPLIST_FILE = ios/App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -443,7 +456,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = P6FX9URFQ2;
 				INFOPLIST_FILE = ios/Widget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -462,7 +475,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = P6FX9URFQ2;
 				INFOPLIST_FILE = ios/Widget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (

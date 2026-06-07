@@ -8,9 +8,15 @@ struct DailyAyahWidget: Widget {
         StaticConfiguration(kind: kind, provider: DailyAyahTimelineProvider()) { entry in
             DailyAyahWidgetView(entry: entry)
         }
-        .configurationDisplayName("Gunun Ayeti")
+        .configurationDisplayName("Günün Ayeti")
         .description("Diyanet'ten gunluk ayeti gosterir.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies([
+            .systemSmall,
+            .systemMedium,
+            .accessoryInline,
+            .accessoryCircular,
+            .accessoryRectangular
+        ])
     }
 }
 

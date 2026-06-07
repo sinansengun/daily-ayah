@@ -52,7 +52,7 @@ struct ContentView: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle("Gunun Ayeti")
+            .navigationTitle("Günün Ayeti")
         }
         .task {
             await refresh()
