@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using DailyAyah.Api.Abstractions;
 using DailyAyah.Api.Config;
+using DailyAyah.Api.Data;
 using DailyAyah.Api.Models;
 
 namespace DailyAyah.Api.Services;
@@ -10,116 +11,120 @@ namespace DailyAyah.Api.Services;
 public sealed class DailyAyahService
 {
     private readonly IDiyanetScraper _scraper;
+    private readonly IDailyAyahRecordStore _store;
     private readonly TimeZoneInfo _turkeyTimeZone;
-    private readonly SemaphoreSlim _refreshLock = new(1, 1);
-    private readonly object _stateLock = new();
 
     private DailyAyahRecord? _current;
     private DailyAyahRecord? _lastSuccess;
-    private readonly List<DailyAyahRecord> _history = [];
+    private IReadOnlyList<DailyAyahRecord> _history = [];
 
-    public DailyAyahService(IDiyanetScraper scraper)
+    public DailyAyahService(IDiyanetScraper scraper, IDailyAyahRecordStore store)
     {
         _scraper = scraper;
+        _store = store;
         _turkeyTimeZone = TimeZoneInfo.FindSystemTimeZoneById(AppConstants.TurkeyTimeZone);
+    }
+
+    public async Task InitializeFromStoreAsync(CancellationToken cancellationToken = default)
+    {
+        if (!_store.IsConfigured)
+        {
+            return;
+        }
+
+        var latest = await _store.GetLatestAsync(cancellationToken);
+        var history = await _store.GetHistoryAsync(30, cancellationToken);
+        var todayTR = GetTurkeyDateIso(DateTimeOffset.UtcNow);
+
+        _history = history;
+
+        if (latest is null)
+        {
+            return;
+        }
+
+        _lastSuccess = latest;
+        if (latest.PublishedDateTR == todayTR)
+        {
+            _current = latest;
+        }
     }
 
     public async Task<DailyAyahApiResponse> RefreshAsync(bool force = false, CancellationToken cancellationToken = default)
     {
         var todayTR = GetTurkeyDateIso(DateTimeOffset.UtcNow);
 
-        lock (_stateLock)
+        if (!force && _current is not null && _current.PublishedDateTR == todayTR)
         {
-            if (!force && _current is not null && _current.PublishedDateTR == todayTR)
-            {
-                return ToApiResponse(_current, isStale: false);
-            }
+            return ToApiResponse(_current, isStale: false);
         }
 
-        await _refreshLock.WaitAsync(cancellationToken);
+        ScrapedAyah scraped;
         try
         {
-            todayTR = GetTurkeyDateIso(DateTimeOffset.UtcNow);
-
-            lock (_stateLock)
-            {
-                if (!force && _current is not null && _current.PublishedDateTR == todayTR)
-                {
-                    return ToApiResponse(_current, isStale: false);
-                }
-            }
-
-            try
-            {
-                var scraped = await _scraper.FetchDailyAyahAsync(cancellationToken);
-                var nowUtc = DateTimeOffset.UtcNow;
-                var record = BuildRecord(scraped, nowUtc);
-
-                lock (_stateLock)
-                {
-                    _current = record;
-                    _lastSuccess = record;
-                    UpsertHistory(record);
-                }
-
-                return ToApiResponse(record, isStale: false);
-            }
-            catch
-            {
-                lock (_stateLock)
-                {
-                    if (_current is not null)
-                    {
-                        return ToApiResponse(_current, isStale: true);
-                    }
-
-                    if (_lastSuccess is not null)
-                    {
-                        _current = _lastSuccess;
-                        return ToApiResponse(_lastSuccess, isStale: true);
-                    }
-                }
-
-                throw;
-            }
+            scraped = await _scraper.FetchDailyAyahAsync(cancellationToken);
         }
-        finally
+        catch
         {
-            _refreshLock.Release();
+            return GetStaleFallbackOrThrow();
         }
+
+        var nowUtc = DateTimeOffset.UtcNow;
+        var record = BuildRecord(scraped, nowUtc);
+        await _store.UpsertAsync(record, cancellationToken);
+
+        _current = record;
+        _lastSuccess = record;
+        UpsertHistory(record);
+
+        return ToApiResponse(record, isStale: false);
     }
 
     public Task<DailyAyahApiResponse> GetDailyAyahAsync(CancellationToken cancellationToken = default)
     {
         var todayTR = GetTurkeyDateIso(DateTimeOffset.UtcNow);
 
-        lock (_stateLock)
+        if (_current is not null && _current.PublishedDateTR == todayTR)
         {
-            if (_current is not null && _current.PublishedDateTR == todayTR)
-            {
-                return Task.FromResult(ToApiResponse(_current, isStale: false));
-            }
+            return Task.FromResult(ToApiResponse(_current, isStale: false));
         }
 
-        return RefreshAsync(force: false, cancellationToken);
+        return Task.FromResult(GetStaleFallbackOrThrow());
     }
 
-    public IReadOnlyList<DailyAyahRecord> GetHistory(int days = 7)
+    public async Task<IReadOnlyList<DailyAyahRecord>> GetHistoryAsync(int days = 7, CancellationToken cancellationToken = default)
     {
         var normalized = Math.Clamp(days, 1, 30);
 
-        lock (_stateLock)
+        var stored = await _store.GetHistoryAsync(normalized, cancellationToken);
+        if (stored.Count > 0)
         {
-            return _history.Take(normalized).ToArray();
+            return stored;
         }
+
+        return _history.Take(normalized).ToArray();
     }
 
     public ServiceSnapshot GetSnapshot()
     {
-        lock (_stateLock)
+        var latest = _current ?? _lastSuccess;
+        return new ServiceSnapshot(latest is not null, latest?.FetchedAt);
+    }
+
+    private DailyAyahApiResponse GetStaleFallbackOrThrow()
+    {
+        if (_current is not null)
         {
-            return new ServiceSnapshot(_current is not null, _current?.FetchedAt);
+            return ToApiResponse(_current, isStale: true);
         }
+
+        if (_lastSuccess is not null)
+        {
+            _current = _lastSuccess;
+            return ToApiResponse(_lastSuccess, isStale: true);
+        }
+
+        throw new InvalidOperationException("Unable to fetch daily ayah and no fallback record is available.");
     }
 
     private DailyAyahRecord BuildRecord(ScrapedAyah scraped, DateTimeOffset nowUtc)
@@ -144,13 +149,11 @@ public sealed class DailyAyahService
 
     private void UpsertHistory(DailyAyahRecord record)
     {
-        _history.RemoveAll(item => item.PublishedDateTR == record.PublishedDateTR);
-        _history.Insert(0, record);
-
-        if (_history.Count > 30)
-        {
-            _history.RemoveRange(30, _history.Count - 30);
-        }
+        _history = _history
+            .Where(item => item.PublishedDateTR != record.PublishedDateTR)
+            .Prepend(record)
+            .Take(30)
+            .ToArray();
     }
 
     private string GetTurkeyDateIso(DateTimeOffset utcNow)

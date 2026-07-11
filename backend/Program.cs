@@ -1,4 +1,5 @@
 using DailyAyah.Api.Abstractions;
+using DailyAyah.Api.Data;
 using DailyAyah.Api.Jobs;
 using DailyAyah.Api.Scraper;
 using DailyAyah.Api.Services;
@@ -21,6 +22,16 @@ builder.Services.AddHttpClient<IDiyanetScraper, DiyanetScraper>(client =>
     client.Timeout = TimeSpan.FromSeconds(15);
 });
 
+var databaseOptions = new DailyAyahDatabaseOptions(DailyAyahDatabaseConfig.ResolveConnectionString(builder.Configuration));
+builder.Services.AddSingleton(databaseOptions);
+builder.Services.AddSingleton<IDailyAyahRecordStore>(provider =>
+{
+    var options = provider.GetRequiredService<DailyAyahDatabaseOptions>();
+    return options.IsConfigured
+        ? new PostgresDailyAyahRecordStore(options)
+        : new NoOpDailyAyahRecordStore();
+});
+builder.Services.AddSingleton<DailyAyahDatabaseInitializer>();
 builder.Services.AddSingleton<DailyAyahService>();
 builder.Services.AddHostedService<DailyAyahRefreshHostedService>();
 
@@ -61,7 +72,7 @@ app.MapGet("/daily-ayah", async (HttpContext context, DailyAyahService service, 
     return Results.Json(payload);
 });
 
-app.MapGet("/daily-ayah/history", (int? days, DailyAyahService service) =>
+app.MapGet("/daily-ayah/history", async (int? days, DailyAyahService service, CancellationToken cancellationToken) =>
 {
     if (days is < 1 or > 30)
     {
@@ -73,20 +84,30 @@ app.MapGet("/daily-ayah/history", (int? days, DailyAyahService service) =>
     }
 
     var normalizedDays = days ?? 7;
+    var items = await service.GetHistoryAsync(normalizedDays, cancellationToken);
 
     return Results.Json(new
     {
         days = normalizedDays,
-        items = service.GetHistory(normalizedDays)
+        items
     });
 });
 
 using (var scope = app.Services.CreateScope())
 {
+    var initializer = scope.ServiceProvider.GetRequiredService<DailyAyahDatabaseInitializer>();
     var service = scope.ServiceProvider.GetRequiredService<DailyAyahService>();
+    var database = scope.ServiceProvider.GetRequiredService<DailyAyahDatabaseOptions>();
+
+    if (!database.IsConfigured)
+    {
+        app.Logger.LogWarning("Daily ayah database is not configured. Set DATABASE_URL or ConnectionStrings__DailyAyahDb to persist crawled records.");
+    }
 
     try
     {
+        await initializer.InitializeAsync(app.Lifetime.ApplicationStopping);
+        await service.InitializeFromStoreAsync(app.Lifetime.ApplicationStopping);
         await service.RefreshAsync(force: true, app.Lifetime.ApplicationStopping);
     }
     catch (Exception ex)
