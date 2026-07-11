@@ -53,6 +53,24 @@ struct DailyAyahHistoryItem: Codable, Equatable {
     let hash: String
 }
 
+extension DailyAyah {
+    init(historyItem: DailyAyahHistoryItem) {
+        self.init(
+            text: historyItem.text,
+            reference: historyItem.reference,
+            hadithText: historyItem.hadithText,
+            hadithReference: historyItem.hadithReference,
+            duaText: historyItem.duaText,
+            duaReference: historyItem.duaReference,
+            source: historyItem.source,
+            publishedDateTR: historyItem.publishedDateTR,
+            fetchedAt: historyItem.fetchedAt,
+            hash: historyItem.hash,
+            isStale: false
+        )
+    }
+}
+
 struct DailyAyahHistoryResponse: Codable, Equatable {
     let days: Int
     let items: [DailyAyahHistoryItem]

@@ -3,14 +3,17 @@ import Foundation
 protocol SharedDailyAyahStoring {
     func saveCurrent(_ ayah: DailyAyah)
     func saveLastSuccessful(_ ayah: DailyAyah)
+    func saveHistory(_ history: [DailyAyah])
     func loadCurrent() -> DailyAyah?
     func loadLastSuccessful() -> DailyAyah?
+    func loadHistory() -> [DailyAyah]
 }
 
 final class SharedDailyAyahStore: SharedDailyAyahStoring {
     private enum Keys {
         static let currentAyah = "daily_ayah_current"
         static let lastSuccessfulAyah = "daily_ayah_last_successful"
+        static let history = "daily_ayah_history"
     }
 
     private let defaults: UserDefaults
@@ -35,12 +38,22 @@ final class SharedDailyAyahStore: SharedDailyAyahStoring {
         defaults.set(data, forKey: Keys.lastSuccessfulAyah)
     }
 
+    func saveHistory(_ history: [DailyAyah]) {
+        guard let data = try? encoder.encode(Array(history.prefix(15))) else { return }
+        defaults.set(data, forKey: Keys.history)
+    }
+
     func loadCurrent() -> DailyAyah? {
         decode(forKey: Keys.currentAyah)
     }
 
     func loadLastSuccessful() -> DailyAyah? {
         decode(forKey: Keys.lastSuccessfulAyah)
+    }
+
+    func loadHistory() -> [DailyAyah] {
+        guard let data = defaults.data(forKey: Keys.history) else { return [] }
+        return (try? decoder.decode([DailyAyah].self, from: data)) ?? []
     }
 
     private func decode(forKey key: String) -> DailyAyah? {

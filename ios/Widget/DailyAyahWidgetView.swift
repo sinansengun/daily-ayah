@@ -29,17 +29,21 @@ struct DailyAyahWidgetView: View {
                         .lineLimit(2)
                 }
             default:
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text(entry.ayah.text)
-                        .font(.system(size: 13, weight: .regular))
-                        .lineLimit(5)
-                        .minimumScaleFactor(0.9)
+                        .font(.system(size: textFontSize, weight: .regular))
+                        .lineLimit(textLineLimit)
+                        .minimumScaleFactor(0.82)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Spacer(minLength: 2)
 
                     Text(entry.ayah.reference)
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: referenceFontSize, weight: .semibold))
                         .lineLimit(1)
                 }
-                .padding(8)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .padding(0)
             }
         }
         .containerBackground(for: .widget) {
@@ -54,5 +58,17 @@ struct DailyAyahWidgetView: View {
     private var shortReference: String {
         let parts = entry.ayah.reference.split(separator: ",")
         return parts.first.map(String.init) ?? entry.ayah.reference
+    }
+
+    private var textFontSize: CGFloat {
+        family == .systemMedium ? 13 : 11
+    }
+
+    private var referenceFontSize: CGFloat {
+        family == .systemMedium ? 12 : 10
+    }
+
+    private var textLineLimit: Int {
+        family == .systemMedium ? 6 : 8
     }
 }

@@ -6,6 +6,7 @@ import WidgetKit
 protocol DailyAyahProviding {
     func loadPreferredAyah() async -> DailyAyah?
     func refreshNowAndReloadWidget() async -> DailyAyah?
+    func loadHistory(days: Int) async -> [DailyAyah]
 }
 
 final class DailyAyahRepository: DailyAyahProviding {
@@ -45,8 +46,22 @@ final class DailyAyahRepository: DailyAyahProviding {
             store.saveLastSuccessful(fresh)
         }
 
+        _ = await loadHistory(days: 15)
+
         notifyWidgetReload()
         return fresh
+    }
+
+    func loadHistory(days: Int) async -> [DailyAyah] {
+        let normalizedDays = min(max(days, 1), 30)
+
+        if let response = try? await client.fetchHistory(days: normalizedDays) {
+            let history = response.items.map(DailyAyah.init(historyItem:))
+            store.saveHistory(history)
+            return history
+        }
+
+        return Array(store.loadHistory().prefix(normalizedDays))
     }
 
     private func notifyWidgetReload() {
