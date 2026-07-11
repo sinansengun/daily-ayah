@@ -50,7 +50,7 @@ app.UseExceptionHandler(errorApp =>
     });
 });
 
-app.MapGet("/health", (DailyAyahService service) =>
+app.MapGet("/health", (DailyAyahService service, DailyAyahDatabaseOptions database) =>
 {
     var snapshot = service.GetSnapshot();
 
@@ -59,7 +59,8 @@ app.MapGet("/health", (DailyAyahService service) =>
         status = "ok",
         now = DateTimeOffset.UtcNow.ToString("O"),
         hasData = snapshot.HasData,
-        lastFetchedAt = snapshot.LastFetchedAt
+        lastFetchedAt = snapshot.LastFetchedAt,
+        databaseConfigured = database.IsConfigured
     });
 });
 
