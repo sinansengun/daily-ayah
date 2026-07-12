@@ -12,6 +12,8 @@ public sealed record ScrapedAyah(
 public sealed record DailyAyahRecord(
     string Text,
     string Reference,
+    int? SurahNumber,
+    int? AyahNumber,
     string? HadithText,
     string? HadithReference,
     string? DuaText,
@@ -25,6 +27,8 @@ public sealed record DailyAyahRecord(
 public sealed record DailyAyahApiResponse(
     string Text,
     string Reference,
+    int? SurahNumber,
+    int? AyahNumber,
     string? HadithText,
     string? HadithReference,
     string? DuaText,
@@ -34,6 +38,23 @@ public sealed record DailyAyahApiResponse(
     string FetchedAt,
     string Hash,
     bool IsStale
+);
+
+public sealed record TafsirAyahResponse(
+    int SurahNumber,
+    string SurahName,
+    int TotalAyahCount,
+    int? MushafOrder,
+    int? NuzulOrder,
+    string? AboutText,
+    int AyahNumber,
+    int AyahRangeStart,
+    int AyahRangeEnd,
+    string? ArabicText,
+    string MealText,
+    string TafsirText,
+    string? SourceReference,
+    string SourceUrl
 );
 
 public sealed record ServiceSnapshot(bool HasData, string? LastFetchedAt);

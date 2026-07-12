@@ -132,10 +132,13 @@ public sealed class DailyAyahService
         var publishedDateTR = GetTurkeyDateIso(nowUtc);
         var fetchedAt = nowUtc.UtcDateTime.ToString("O", CultureInfo.InvariantCulture);
         var fingerprint = $"{scraped.Text}|{scraped.Reference}|{scraped.HadithText ?? string.Empty}|{scraped.HadithReference ?? string.Empty}|{scraped.DuaText ?? string.Empty}|{scraped.DuaReference ?? string.Empty}|{publishedDateTR}";
+        var tafsirReference = AyahReferenceParser.Parse(scraped.Reference);
 
         return new DailyAyahRecord(
             scraped.Text,
             scraped.Reference,
+            tafsirReference.SurahNumber,
+            tafsirReference.AyahNumber,
             scraped.HadithText,
             scraped.HadithReference,
             scraped.DuaText,
@@ -167,6 +170,8 @@ public sealed class DailyAyahService
         return new DailyAyahApiResponse(
             record.Text,
             record.Reference,
+            record.SurahNumber,
+            record.AyahNumber,
             record.HadithText,
             record.HadithReference,
             record.DuaText,

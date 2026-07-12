@@ -24,6 +24,7 @@ protocol DailyAyahClientProtocol {
     func fetchDailyAyah() async throws -> DailyAyah
     func fetchHistory(days: Int) async throws -> DailyAyahHistoryResponse
     func fetchHealth() async throws -> HealthResponse
+    func fetchTafsir(surahNumber: Int, ayahNumber: Int) async throws -> TafsirAyah
 }
 
 final class DailyAyahClient: DailyAyahClientProtocol {
@@ -50,6 +51,10 @@ final class DailyAyahClient: DailyAyahClientProtocol {
 
     func fetchHealth() async throws -> HealthResponse {
         try await sendRequest(path: "/health")
+    }
+
+    func fetchTafsir(surahNumber: Int, ayahNumber: Int) async throws -> TafsirAyah {
+        try await sendRequest(path: "/tafsir/\(surahNumber)/\(ayahNumber)")
     }
 
     private func sendRequest<T: Decodable>(path: String) async throws -> T {

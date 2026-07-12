@@ -21,6 +21,8 @@ public sealed class PostgresDailyAyahRecordStore(DailyAyahDatabaseOptions option
                 published_date_tr text PRIMARY KEY,
                 ayah_reference text NOT NULL,
                 ayah_text text NOT NULL,
+                surah_number integer NULL,
+                ayah_number integer NULL,
                 hadith_reference text NULL,
                 hadith_text text NULL,
                 dua_reference text NULL,
@@ -34,6 +36,12 @@ public sealed class PostgresDailyAyahRecordStore(DailyAyahDatabaseOptions option
 
             CREATE INDEX IF NOT EXISTS ix_daily_ayahs_published_date_tr_desc
                 ON daily_ayahs (published_date_tr DESC);
+
+            ALTER TABLE daily_ayahs
+                ADD COLUMN IF NOT EXISTS surah_number integer NULL;
+
+            ALTER TABLE daily_ayahs
+                ADD COLUMN IF NOT EXISTS ayah_number integer NULL;
             """;
 
         await command.ExecuteNonQueryAsync(cancellationToken);
@@ -53,6 +61,8 @@ public sealed class PostgresDailyAyahRecordStore(DailyAyahDatabaseOptions option
                 published_date_tr,
                 ayah_reference,
                 ayah_text,
+                surah_number,
+                ayah_number,
                 hadith_reference,
                 hadith_text,
                 dua_reference,
@@ -65,6 +75,8 @@ public sealed class PostgresDailyAyahRecordStore(DailyAyahDatabaseOptions option
                 @published_date_tr,
                 @ayah_reference,
                 @ayah_text,
+                @surah_number,
+                @ayah_number,
                 @hadith_reference,
                 @hadith_text,
                 @dua_reference,
@@ -76,6 +88,8 @@ public sealed class PostgresDailyAyahRecordStore(DailyAyahDatabaseOptions option
             ON CONFLICT (published_date_tr) DO UPDATE SET
                 ayah_reference = EXCLUDED.ayah_reference,
                 ayah_text = EXCLUDED.ayah_text,
+                surah_number = EXCLUDED.surah_number,
+                ayah_number = EXCLUDED.ayah_number,
                 hadith_reference = EXCLUDED.hadith_reference,
                 hadith_text = EXCLUDED.hadith_text,
                 dua_reference = EXCLUDED.dua_reference,
@@ -139,6 +153,8 @@ public sealed class PostgresDailyAyahRecordStore(DailyAyahDatabaseOptions option
         SELECT
             ayah_text,
             ayah_reference,
+            surah_number,
+            ayah_number,
             hadith_text,
             hadith_reference,
             dua_text,
@@ -162,6 +178,8 @@ public sealed class PostgresDailyAyahRecordStore(DailyAyahDatabaseOptions option
         command.Parameters.AddWithValue("published_date_tr", record.PublishedDateTR);
         command.Parameters.AddWithValue("ayah_reference", record.Reference);
         command.Parameters.AddWithValue("ayah_text", record.Text);
+        command.Parameters.AddWithValue("surah_number", DbValue(record.SurahNumber));
+        command.Parameters.AddWithValue("ayah_number", DbValue(record.AyahNumber));
         command.Parameters.AddWithValue("hadith_reference", DbValue(record.HadithReference));
         command.Parameters.AddWithValue("hadith_text", DbValue(record.HadithText));
         command.Parameters.AddWithValue("dua_reference", DbValue(record.DuaReference));
@@ -173,9 +191,14 @@ public sealed class PostgresDailyAyahRecordStore(DailyAyahDatabaseOptions option
 
     private static DailyAyahRecord ReadRecord(NpgsqlDataReader reader)
     {
+        var reference = reader.GetString(reader.GetOrdinal("ayah_reference"));
+        var parsedReference = AyahReferenceParser.Parse(reference);
+
         return new DailyAyahRecord(
             reader.GetString(reader.GetOrdinal("ayah_text")),
-            reader.GetString(reader.GetOrdinal("ayah_reference")),
+            reference,
+            GetNullableInt(reader, "surah_number") ?? parsedReference.SurahNumber,
+            GetNullableInt(reader, "ayah_number") ?? parsedReference.AyahNumber,
             GetNullableString(reader, "hadith_text"),
             GetNullableString(reader, "hadith_reference"),
             GetNullableString(reader, "dua_text"),
@@ -193,8 +216,19 @@ public sealed class PostgresDailyAyahRecordStore(DailyAyahDatabaseOptions option
         return reader.IsDBNull(ordinal) ? null : reader.GetString(ordinal);
     }
 
+    private static int? GetNullableInt(NpgsqlDataReader reader, string name)
+    {
+        var ordinal = reader.GetOrdinal(name);
+        return reader.IsDBNull(ordinal) ? null : reader.GetInt32(ordinal);
+    }
+
     private static object DbValue(string? value)
     {
         return string.IsNullOrWhiteSpace(value) ? DBNull.Value : value;
+    }
+
+    private static object DbValue(int? value)
+    {
+        return value.HasValue ? value.Value : DBNull.Value;
     }
 }

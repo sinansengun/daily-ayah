@@ -7,6 +7,7 @@ protocol DailyAyahProviding {
     func loadPreferredAyah() async -> DailyAyah?
     func refreshNowAndReloadWidget() async -> DailyAyah?
     func loadHistory(days: Int) async -> [DailyAyah]
+    func loadTafsir(surahNumber: Int, ayahNumber: Int) async -> TafsirAyah?
 }
 
 final class DailyAyahRepository: DailyAyahProviding {
@@ -62,6 +63,19 @@ final class DailyAyahRepository: DailyAyahProviding {
         }
 
         return Array(store.loadHistory().prefix(normalizedDays))
+    }
+
+    func loadTafsir(surahNumber: Int, ayahNumber: Int) async -> TafsirAyah? {
+        if let cached = store.loadTafsir(surahNumber: surahNumber, ayahNumber: ayahNumber) {
+            return cached
+        }
+
+        guard let tafsir = try? await client.fetchTafsir(surahNumber: surahNumber, ayahNumber: ayahNumber) else {
+            return nil
+        }
+
+        store.saveTafsir(tafsir)
+        return tafsir
     }
 
     private func notifyWidgetReload() {
