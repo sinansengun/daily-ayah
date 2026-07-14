@@ -5,7 +5,7 @@ settings:
   base:
     SWIFT_VERSION: 5.0
     IPHONEOS_DEPLOYMENT_TARGET: "17.0"
-    CURRENT_PROJECT_VERSION: 2
+    CURRENT_PROJECT_VERSION: 5
     MARKETING_VERSION: 1.0
 
 targets:
@@ -45,3 +45,9 @@ targets:
         INFOPLIST_FILE: Widget/Info.plist
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: "P6FX9URFQ2"
+
+schemes:
+  DailyAyahApp:
+    build:
+      targets:
+        DailyAyahApp: all

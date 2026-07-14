@@ -9,6 +9,7 @@ struct ContentView: View {
     @State private var errorMessage: String?
     @State private var selectedTafsir: TafsirRoute?
     @State private var selectedSurah: SurahRoute?
+    @State private var isShowingTutorial = false
 
     private static let inputDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -69,6 +70,21 @@ struct ContentView: View {
             }
             .navigationDestination(item: $selectedSurah) { route in
                 SurahDetailView(route: route, repository: repository)
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isShowingTutorial = true
+                    } label: {
+                        Image(systemName: "questionmark.circle")
+                    }
+                    .accessibilityLabel("Tutorial")
+                }
+            }
+        }
+        .fullScreenCover(isPresented: $isShowingTutorial) {
+            OnboardingView {
+                isShowingTutorial = false
             }
         }
         .task {
@@ -199,24 +215,32 @@ struct ContentView: View {
 
     @ViewBuilder
     private func contentCard(title: String, text: String, reference: String?, tafsirRoute: TafsirRoute? = nil, surahRoute: SurahRoute? = nil) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.largeTitle)
-                .bold()
+        let resolvedReference = reference?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let hasReference = resolvedReference?.isEmpty == false
+
+        VStack(alignment: .leading, spacing: 14) {
+            VStack(spacing: 4) {
+                Text(hasReference ? resolvedReference ?? title : title)
+                    .font(.title.bold())
+                    .multilineTextAlignment(.center)
+
+                if hasReference {
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(text)
                     .font(.body)
 
-                if let reference, !reference.isEmpty {
-                    HStack(spacing: 4) {
-                        Text(reference)
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(.primary)
-
-                        Spacer(minLength: 8)
-
-                        actionsMenu(title: title, text: text, reference: reference, tafsirRoute: tafsirRoute, surahRoute: surahRoute)
+                if let resolvedReference, hasReference {
+                    HStack {
+                        Spacer()
+                        actionsMenu(title: title, text: text, reference: resolvedReference, tafsirRoute: tafsirRoute, surahRoute: surahRoute)
                     }
                     .buttonStyle(.plain)
                     .foregroundStyle(.secondary)
