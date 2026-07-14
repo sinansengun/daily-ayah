@@ -5,7 +5,7 @@ settings:
   base:
     SWIFT_VERSION: 5.0
     IPHONEOS_DEPLOYMENT_TARGET: "17.0"
-    CURRENT_PROJECT_VERSION: 1
+    CURRENT_PROJECT_VERSION: 2
     MARKETING_VERSION: 1.0
 
 targets:
@@ -17,12 +17,13 @@ targets:
       - path: App
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.example.dailyayah.app
+        PRODUCT_BUNDLE_IDENTIFIER: com.cufica.dailyayah
+        CODE_SIGN_ENTITLEMENTS: App/DailyAyah.entitlements
         PRODUCT_NAME: DailyAyah
         INFOPLIST_FILE: App/Info.plist
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_STYLE: Automatic
-        DEVELOPMENT_TEAM: "JG5Z7XV88C"
+        DEVELOPMENT_TEAM: "P6FX9URFQ2"
     dependencies:
       - target: DailyAyahWidgetExtension
 
@@ -38,8 +39,9 @@ targets:
       - path: App/Storage
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.example.dailyayah.app.widget
+        PRODUCT_BUNDLE_IDENTIFIER: com.cufica.dailyayah.widget
+        CODE_SIGN_ENTITLEMENTS: Widget/DailyAyahWidget.entitlements
         PRODUCT_NAME: DailyAyahWidgetExtension
         INFOPLIST_FILE: Widget/Info.plist
         CODE_SIGN_STYLE: Automatic
-        DEVELOPMENT_TEAM: "JG5Z7XV88C"
+        DEVELOPMENT_TEAM: "P6FX9URFQ2"

@@ -20,7 +20,7 @@ struct ContentView: View {
     private static let outputDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "tr_TR")
-        formatter.dateFormat = "dd.MM.yyyy"
+        formatter.dateFormat = "d MMMM"
         return formatter
     }()
 
@@ -61,6 +61,9 @@ struct ContentView: View {
                     }
                 }
             }
+            .background {
+                backgroundImage
+            }
             .navigationDestination(item: $selectedTafsir) { route in
                 TafsirDetailView(route: route, repository: repository)
             }
@@ -70,6 +73,20 @@ struct ContentView: View {
         }
         .task {
             await refresh()
+        }
+    }
+
+    private var backgroundImage: some View {
+        ZStack {
+            Image("AppBackground")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+                .opacity(0.28)
+
+            Color(.systemBackground)
+                .opacity(0.76)
+                .ignoresSafeArea()
         }
     }
 
@@ -145,9 +162,9 @@ struct ContentView: View {
             .animation(nil, value: selectedIndex)
 
             HStack(spacing: 16) {
-                if canShowPreviousDay {
+                if canShowNextDay {
                     Button {
-                        showPreviousDay()
+                        showNextDay()
                     } label: {
                         Image(systemName: "chevron.left")
                             .font(.headline)
@@ -159,13 +176,13 @@ struct ContentView: View {
                 }
 
                 Text(formattedDate(from: ayah.publishedDateTR))
-                    .font(.footnote.weight(.bold))
+                    .font(.headline.weight(.bold))
                     .foregroundStyle(.secondary)
                     .frame(minWidth: 96)
 
-                if canShowNextDay {
+                if canShowPreviousDay {
                     Button {
-                        showNextDay()
+                        showPreviousDay()
                     } label: {
                         Image(systemName: "chevron.right")
                             .font(.headline)
