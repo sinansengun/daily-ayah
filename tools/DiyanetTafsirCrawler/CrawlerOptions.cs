@@ -7,6 +7,7 @@ public sealed record CrawlerOptions(
     int ToSurah,
     bool SurahsOnly,
     bool VerifySurahs,
+    bool VerifyAyahs,
     bool SkipExisting,
     TimeSpan Delay,
     int MaxRetries,
@@ -22,6 +23,7 @@ public sealed record CrawlerOptions(
         var toSurah = 114;
         var surahsOnly = false;
         var verifySurahs = false;
+        var verifyAyahs = false;
         var skipExisting = false;
         var delayMs = 750;
         var maxRetries = 3;
@@ -45,6 +47,9 @@ public sealed record CrawlerOptions(
                     break;
                 case "--verify-surahs":
                     verifySurahs = true;
+                    break;
+                case "--verify-ayahs":
+                    verifyAyahs = true;
                     break;
                 case "--help":
                 case "-h":
@@ -108,7 +113,7 @@ public sealed record CrawlerOptions(
             }
         }
 
-        return new CrawlerOptions(dryRun, surah, fromSurah, toSurah, surahsOnly, verifySurahs, skipExisting, TimeSpan.FromMilliseconds(delayMs), maxRetries, purgeFromSurah, purgeToSurah, showHelp);
+        return new CrawlerOptions(dryRun, surah, fromSurah, toSurah, surahsOnly, verifySurahs, verifyAyahs, skipExisting, TimeSpan.FromMilliseconds(delayMs), maxRetries, purgeFromSurah, purgeToSurah, showHelp);
     }
 
     public static string HelpText => """
@@ -124,6 +129,7 @@ public sealed record CrawlerOptions(
           --to-surah <1-114>     Last surah number to crawl. Default: 114.
                     --surahs-only          Import only surah metadata without crawling ayah tafsir pages.
           --verify-surahs        Print tafsir_surahs row counts and exit.
+                      --verify-ayahs         Print tafsir_ayahs row counts, expected counts, and missing ayahs; then exit.
           --skip-existing        Skip ayahs that already exist in PostgreSQL.
           --delay-ms <number>    Delay between HTTP requests. Default: 750.
           --max-retries <number> HTTP retry attempts per page. Default: 3.

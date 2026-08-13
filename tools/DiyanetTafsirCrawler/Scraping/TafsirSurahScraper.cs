@@ -29,10 +29,10 @@ public sealed partial class TafsirSurahScraper(DiyanetPageClient pageClient)
             throw new InvalidOperationException($"No ayah links found for surah {summary.SurahNumber}: {summary.SourceUri}");
         }
 
-        var expandedAyahCount = ayahLinks.Sum(link => link.EndAyahNumber - link.StartAyahNumber + 1);
-        if (validateAyahLinks && totalAyahCount > 0 && expandedAyahCount != totalAyahCount)
+        var discoveredAyahCount = ayahLinks.SelectMany(link => link.AyahNumbers).Distinct().Count();
+        if (validateAyahLinks && totalAyahCount > 0 && discoveredAyahCount != totalAyahCount)
         {
-            throw new InvalidOperationException($"Expected {totalAyahCount} ayahs for surah {summary.SurahNumber}, but Diyanet links expand to {expandedAyahCount}.");
+            throw new InvalidOperationException($"Expected {totalAyahCount} ayahs for surah {summary.SurahNumber}, but Diyanet links include {discoveredAyahCount} distinct ayahs.");
         }
 
         return new TafsirSurah(

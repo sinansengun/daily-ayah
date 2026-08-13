@@ -41,11 +41,30 @@ try
             Console.WriteLine($"surah_number range: {stats.MinSurah?.ToString() ?? "-"}-{stats.MaxSurah?.ToString() ?? "-"}");
             return 0;
         }
+
+        if (options.VerifyAyahs)
+        {
+            var stats = await store.GetAyahTableStatsAsync();
+            Console.WriteLine($"tafsir_ayahs rows: {stats.TotalCount}");
+            Console.WriteLine($"expected ayahs from tafsir_surahs: {stats.ExpectedCount}");
+            Console.WriteLine($"missing ayahs: {stats.MissingAyahs.Count}");
+            foreach (var missing in stats.MissingAyahs.Take(50))
+            {
+                Console.WriteLine($"- {missing.SurahNumber}:{missing.AyahNumber}");
+            }
+
+            if (stats.MissingAyahs.Count > 50)
+            {
+                Console.WriteLine($"- ... {stats.MissingAyahs.Count - 50} more");
+            }
+
+            return stats.MissingAyahs.Count == 0 ? 0 : 1;
+        }
     }
 
-    if (options.VerifySurahs)
+    if (options.VerifySurahs || options.VerifyAyahs)
     {
-        Console.Error.WriteLine("DATABASE_URL or ConnectionStrings__DailyAyahDb must be set for --verify-surahs.");
+        Console.Error.WriteLine("DATABASE_URL or ConnectionStrings__DailyAyahDb must be set for verification.");
         return 2;
     }
 

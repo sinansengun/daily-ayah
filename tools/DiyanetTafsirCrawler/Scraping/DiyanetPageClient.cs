@@ -1,4 +1,5 @@
 using HtmlAgilityPack;
+using System.Net;
 
 namespace DiyanetTafsirCrawler.Scraping;
 
@@ -40,6 +41,6 @@ public sealed class DiyanetPageClient(HttpClient httpClient, TimeSpan delay, int
 
     public Uri ToAbsoluteUri(string href)
     {
-        return new Uri(httpClient.BaseAddress!, href);
+        return new Uri(httpClient.BaseAddress!, WebUtility.HtmlDecode(href));
     }
 }

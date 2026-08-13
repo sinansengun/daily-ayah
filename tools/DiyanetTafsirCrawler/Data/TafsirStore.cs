@@ -179,6 +179,56 @@ public sealed class TafsirStore(string connectionString)
 
     public sealed record SurahTableStats(int TotalCount, int AboutCount, int? MinSurah, int? MaxSurah);
 
+    public async Task<AyahTableStats> GetAyahTableStatsAsync(CancellationToken cancellationToken = default)
+    {
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = connection.CreateCommand();
+        command.CommandText = """
+            SELECT
+                (SELECT count(*)::integer FROM tafsir_ayahs) AS total_count,
+                COALESCE((SELECT sum(total_ayah_count)::integer FROM tafsir_surahs), 0) AS expected_count;
+            """;
+
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        var totalCount = 0;
+        var expectedCount = 0;
+        if (await reader.ReadAsync(cancellationToken))
+        {
+            totalCount = reader.GetInt32(reader.GetOrdinal("total_count"));
+            expectedCount = reader.GetInt32(reader.GetOrdinal("expected_count"));
+        }
+
+        await reader.DisposeAsync();
+
+        await using var missingCommand = connection.CreateCommand();
+        missingCommand.CommandText = """
+            WITH expected AS (
+                SELECT s.surah_number, generate_series(1, s.total_ayah_count) AS ayah_number
+                FROM tafsir_surahs s
+            )
+            SELECT expected.surah_number, expected.ayah_number
+            FROM expected
+            LEFT JOIN tafsir_ayahs a
+                ON a.surah_number = expected.surah_number
+                AND a.ayah_number = expected.ayah_number
+            WHERE a.surah_number IS NULL
+            ORDER BY expected.surah_number, expected.ayah_number;
+            """;
+
+        var missing = new List<MissingAyah>();
+        await using var missingReader = await missingCommand.ExecuteReaderAsync(cancellationToken);
+        while (await missingReader.ReadAsync(cancellationToken))
+        {
+            missing.Add(new MissingAyah(missingReader.GetInt32(0), missingReader.GetInt32(1)));
+        }
+
+        return new AyahTableStats(totalCount, expectedCount, missing);
+    }
+
+    public sealed record AyahTableStats(int TotalCount, int ExpectedCount, IReadOnlyList<MissingAyah> MissingAyahs);
+
+    public sealed record MissingAyah(int SurahNumber, int AyahNumber);
+
     public async Task<bool> UpsertAyahAsync(TafsirAyah ayah, CancellationToken cancellationToken = default)
     {
         await using var connection = await OpenConnectionAsync(cancellationToken);
