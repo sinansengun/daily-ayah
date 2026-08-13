@@ -136,7 +136,7 @@ struct ContentView: View {
 
     @ViewBuilder
     private func contentList(for ayah: DailyAyah) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 28) {
             contentCard(
                 title: "Günün Ayeti",
                 text: ayah.text,
@@ -219,33 +219,33 @@ struct ContentView: View {
         let hasReference = resolvedReference?.isEmpty == false
 
         VStack(alignment: .leading, spacing: 14) {
-            VStack(spacing: 4) {
-                Text(hasReference ? resolvedReference ?? title : title)
-                    .font(.title.bold())
-                    .multilineTextAlignment(.center)
-
-                if hasReference {
+            HStack(alignment: .top, spacing: 12) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text(title)
-                        .font(.subheadline.weight(.semibold))
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(hasReference ? .secondary : .primary)
+                        .multilineTextAlignment(.leading)
+
+                    if hasReference {
+                        Text(resolvedReference ?? title)
+                            .font(.title2.bold())
+                            .multilineTextAlignment(.leading)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                if let resolvedReference, hasReference {
+                    actionsMenu(title: title, text: text, reference: resolvedReference, tafsirRoute: tafsirRoute, surahRoute: surahRoute)
+                        .buttonStyle(.plain)
                         .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .center)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.leading, 14)
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(text)
                     .font(.body)
-
-                if let resolvedReference, hasReference {
-                    HStack {
-                        Spacer()
-                        actionsMenu(title: title, text: text, reference: resolvedReference, tafsirRoute: tafsirRoute, surahRoute: surahRoute)
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(.secondary)
-                    .padding(.top, 6)
-                }
             }
             .padding(.leading, 14)
         }

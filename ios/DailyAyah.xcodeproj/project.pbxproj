@@ -65,12 +65,12 @@
 		7A4519052AEE060AD2EA7D53 /* DailyAyahWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DailyAyahWidget.entitlements; sourceTree = "<group>"; };
 		9762890E56152A73D97FCA28 /* DailyAyahWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahWidgetView.swift; sourceTree = "<group>"; };
 		A47673FB3E2E8EDEFBA62734 /* DailyAyah.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyah.swift; sourceTree = "<group>"; };
-		B0D64E0666254304A68D6420 /* DailyAyahWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DailyAyahWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B0D64E0666254304A68D6420 /* DailyAyahWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DailyAyahWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9C136D7F229B6C9966C5D4B /* AppGroupConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroupConfig.swift; sourceTree = "<group>"; };
 		D878CD6F6D1700CB8763291A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E287C5161C937FDEAD9808B7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E4E6AC3A24F71871340A3EE6 /* DailyAyahWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahWidget.swift; sourceTree = "<group>"; };
-		EA23B2C9340EFB40D96CC08B /* DailyAyah.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DailyAyah.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA23B2C9340EFB40D96CC08B /* DailyAyahApp.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DailyAyahApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0C61A38498B822F075612F9 /* DailyAyahClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahClient.swift; sourceTree = "<group>"; };
 		F105E085648D313F28AE64F7 /* DailyAyahTimelineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAyahTimelineProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -117,7 +117,7 @@
 		CDDA22967036AED95E8D9784 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				EA23B2C9340EFB40D96CC08B /* DailyAyah.app */,
+				EA23B2C9340EFB40D96CC08B /* DailyAyahApp.app */,
 				B0D64E0666254304A68D6420 /* DailyAyahWidgetExtension.appex */,
 			);
 			name = Products;
@@ -202,7 +202,7 @@
 			packageProductDependencies = (
 			);
 			productName = DailyAyahApp;
-			productReference = EA23B2C9340EFB40D96CC08B /* DailyAyah.app */;
+			productReference = EA23B2C9340EFB40D96CC08B /* DailyAyahApp.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -333,7 +333,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 7;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -371,7 +371,6 @@
 				CODE_SIGN_ENTITLEMENTS = App/DailyAyah.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = P6FX9URFQ2;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -382,11 +381,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.cufica.dailyayah;
 				PRODUCT_NAME = DailyAyah;
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -424,7 +419,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 7;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -455,7 +450,6 @@
 				CODE_SIGN_ENTITLEMENTS = App/DailyAyah.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = P6FX9URFQ2;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -466,11 +460,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.cufica.dailyayah;
 				PRODUCT_NAME = DailyAyah;
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -479,7 +469,6 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Widget/DailyAyahWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = P6FX9URFQ2;
 				INFOPLIST_FILE = Widget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -491,11 +480,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.cufica.dailyayah.widget;
 				PRODUCT_NAME = DailyAyahWidgetExtension;
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -504,7 +489,6 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Widget/DailyAyahWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = P6FX9URFQ2;
 				INFOPLIST_FILE = Widget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -516,11 +500,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.cufica.dailyayah.widget;
 				PRODUCT_NAME = DailyAyahWidgetExtension;
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};

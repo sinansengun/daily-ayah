@@ -42,13 +42,22 @@ struct DailyAyahWidgetView: View {
                         .font(.system(size: referenceFontSize, weight: .semibold))
                         .lineLimit(1)
                 }
+                .foregroundStyle(Color(red: 0.16, green: 0.18, blue: 0.20))
+                .shadow(color: .white.opacity(0.35), radius: 1, y: 1)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 .padding(0)
             }
         }
         .containerBackground(for: .widget) {
             if family == .systemSmall || family == .systemMedium {
-                Color(.tertiarySystemFill)
+                LinearGradient(
+                    colors: [
+                        Color.white,
+                        Color(red: 0.88, green: 0.90, blue: 0.92)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
             } else {
                 Color.clear
             }
@@ -61,11 +70,11 @@ struct DailyAyahWidgetView: View {
     }
 
     private var textFontSize: CGFloat {
-        family == .systemMedium ? 13 : 11
+        family == .systemMedium ? 14 : 12
     }
 
     private var referenceFontSize: CGFloat {
-        family == .systemMedium ? 12 : 10
+        family == .systemMedium ? 15 : 12
     }
 
     private var textLineLimit: Int {
