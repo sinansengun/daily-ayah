@@ -22,6 +22,11 @@ builder.Services.AddHttpClient<IDiyanetScraper, DiyanetScraper>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(15);
 });
+builder.Services.AddHttpClient<PrayerTimesService>(client =>
+{
+    client.BaseAddress = new Uri("https://api.aladhan.com/");
+    client.Timeout = TimeSpan.FromSeconds(15);
+});
 
 var databaseOptions = new DailyAyahDatabaseOptions(DailyAyahDatabaseConfig.ResolveConnectionString(builder.Configuration));
 builder.Services.AddSingleton(databaseOptions);
@@ -114,6 +119,17 @@ app.MapGet("/daily-ayah/history", async (int? days, DailyAyahService service, Ca
         items
     });
 });
+
+app.MapGet("/prayer-times", async (string? city, PrayerTimesService service, CancellationToken cancellationToken) =>
+{
+    var result = await service.GetAsync(city, cancellationToken);
+    return Results.Json(result);
+});
+
+app.MapGet("/prayer-times/cities", (PrayerTimesService service) => Results.Json(new
+{
+    items = service.SupportedCities.Order()
+}));
 
 app.MapGet("/tafsir/{surahNumber:int}/{ayahNumber:int}", async (int surahNumber, int ayahNumber, ITafsirAyahStore store, CancellationToken cancellationToken) =>
 {

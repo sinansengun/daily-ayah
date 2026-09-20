@@ -5,10 +5,12 @@ protocol SharedDailyAyahStoring {
     func saveLastSuccessful(_ ayah: DailyAyah)
     func saveHistory(_ history: [DailyAyah])
     func saveTafsir(_ tafsir: TafsirAyah)
+    func saveZikirmatikState(_ state: ZikirmatikState)
     func loadCurrent() -> DailyAyah?
     func loadLastSuccessful() -> DailyAyah?
     func loadHistory() -> [DailyAyah]
     func loadTafsir(surahNumber: Int, ayahNumber: Int) -> TafsirAyah?
+    func loadZikirmatikState() -> ZikirmatikState
 }
 
 final class SharedDailyAyahStore: SharedDailyAyahStoring {
@@ -17,6 +19,7 @@ final class SharedDailyAyahStore: SharedDailyAyahStoring {
         static let lastSuccessfulAyah = "daily_ayah_last_successful"
         static let history = "daily_ayah_history"
         static let tafsirPrefix = "daily_ayah_tafsir"
+        static let zikirmatikState = "zikirmatik_state"
     }
 
     private let defaults: UserDefaults
@@ -51,6 +54,11 @@ final class SharedDailyAyahStore: SharedDailyAyahStoring {
         defaults.set(data, forKey: tafsirKey(surahNumber: tafsir.surahNumber, ayahNumber: tafsir.ayahNumber))
     }
 
+    func saveZikirmatikState(_ state: ZikirmatikState) {
+        guard let data = try? encoder.encode(state) else { return }
+        defaults.set(data, forKey: Keys.zikirmatikState)
+    }
+
     func loadCurrent() -> DailyAyah? {
         decode(forKey: Keys.currentAyah)
     }
@@ -67,6 +75,14 @@ final class SharedDailyAyahStore: SharedDailyAyahStoring {
     func loadTafsir(surahNumber: Int, ayahNumber: Int) -> TafsirAyah? {
         guard let data = defaults.data(forKey: tafsirKey(surahNumber: surahNumber, ayahNumber: ayahNumber)) else { return nil }
         return try? decoder.decode(TafsirAyah.self, from: data)
+    }
+
+    func loadZikirmatikState() -> ZikirmatikState {
+        guard let data = defaults.data(forKey: Keys.zikirmatikState) else {
+            return .default
+        }
+
+        return (try? decoder.decode(ZikirmatikState.self, from: data)) ?? .default
     }
 
     private func decode(forKey key: String) -> DailyAyah? {

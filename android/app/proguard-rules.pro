@@ -1,0 +1,1 @@
+# Add application-specific shrinking rules here as they become necessary.

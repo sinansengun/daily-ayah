@@ -24,5 +24,6 @@ struct DailyAyahWidget: Widget {
 struct DailyAyahWidgetBundle: WidgetBundle {
     var body: some Widget {
         DailyAyahWidget()
+        ZikirmatikWidget()
     }
 }
