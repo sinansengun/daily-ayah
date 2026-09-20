@@ -7,7 +7,9 @@ import com.cufica.dailyayah.data.DailyAyahRepository
 import com.cufica.dailyayah.data.model.DailyAyah
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import com.cufica.dailyayah.widget.DailyAyahWidgetUpdater
+import com.cufica.dailyayah.widget.DailyAyahWidgetProvider
+import com.cufica.dailyayah.widget.DailyAyahOnlyWidgetProvider
+import com.cufica.dailyayah.widget.AllInOneWidgetProvider
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,7 +40,11 @@ class DailyAyahViewModel @Inject constructor(
             mutableUiState.value = mutableUiState.value.copy(isLoading = true, errorMessage = null)
             val ayah = repository.refreshNow()
             val history = repository.loadHistory(HISTORY_DAYS)
-            ayah?.let { DailyAyahWidgetUpdater.update(context, it) }
+            ayah?.let {
+                DailyAyahWidgetProvider.requestRefresh(context)
+                DailyAyahOnlyWidgetProvider.requestRefresh(context)
+                AllInOneWidgetProvider.requestRefresh(context)
+            }
             mutableUiState.value = DailyAyahUiState(
                 isLoading = false,
                 ayah = ayah,

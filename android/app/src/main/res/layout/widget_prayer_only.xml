@@ -1,60 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/widget_zikirmatik_root"
+    android:id="@+id/widget_prayer_only_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <ImageView
-        android:id="@+id/widget_zikirmatik_background"
+        android:id="@+id/widget_prayer_only_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@null"
         android:scaleType="fitXY"
         android:src="@drawable/widget_background" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:orientation="vertical">
-
-        <ProgressBar
-            android:id="@+id/widget_zikirmatik_progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="6dp"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginBottom="4dp"
-            android:max="100" />
-
+        android:orientation="vertical"
+        android:padding="8dp">
         <TextView
-            android:id="@+id/widget_zikirmatik_count"
+            android:id="@+id/widget_prayer_only_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
-            android:textColor="#283038"
-            android:textSize="24sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
-
         <TextView
-            android:id="@+id/widget_zikirmatik_name"
+            android:id="@+id/widget_prayer_only_countdown"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/widget_prayer_only_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
-            android:paddingHorizontal="4dp"
-            android:textColor="#283038"
-            android:textSize="10sp" />
-
-        <TextView
-            android:id="@+id/widget_zikirmatik_target"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="#56616b"
-            android:textSize="11sp" />
+            android:textSize="9sp" />
     </LinearLayout>
 </FrameLayout>

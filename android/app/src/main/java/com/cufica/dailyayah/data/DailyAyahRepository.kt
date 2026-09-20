@@ -13,6 +13,7 @@ import javax.inject.Singleton
 
 interface DailyAyahRepository {
     suspend fun loadPreferredAyah(): DailyAyah?
+    suspend fun loadCachedAyah(): DailyAyah?
     suspend fun refreshNow(): DailyAyah?
     suspend fun loadHistory(days: Int): List<DailyAyah>
     suspend fun loadTafsir(surahNumber: Int, ayahNumber: Int): TafsirAyah?
@@ -33,6 +34,8 @@ class DefaultDailyAyahRepository @Inject constructor(
     }
 
     override suspend fun refreshNow(): DailyAyah? = loadPreferredAyah()
+
+    override suspend fun loadCachedAyah(): DailyAyah? = loadCurrent() ?: loadLastSuccessful()
 
     override suspend fun loadHistory(days: Int): List<DailyAyah> {
         val normalizedDays = days.coerceIn(1, 30)
