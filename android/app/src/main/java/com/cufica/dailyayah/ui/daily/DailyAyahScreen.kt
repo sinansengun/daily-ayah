@@ -70,9 +70,16 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun DailyAyahRoute(viewModel: DailyAyahViewModel = hiltViewModel()) {
+fun DailyAyahRoute(
+    onOpenDetail: (DetailDestination) -> Unit = {},
+    viewModel: DailyAyahViewModel = hiltViewModel()
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    DailyAyahScreen(uiState = uiState, onRefresh = viewModel::refresh)
+    RedesignedDailyAyahScreen(
+        uiState = uiState,
+        onRefresh = viewModel::refresh,
+        onOpenDetail = onOpenDetail
+    )
 }
 
 @Composable

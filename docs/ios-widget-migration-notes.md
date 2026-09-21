@@ -1,6 +1,6 @@
 # iOS Widget Hazirlik Notlari
 
-Bu belge, 20 Eylul 2026 tarihinde Android widget'larinda tamamlanan davranislari ve bunlarin iOS WidgetKit tarafina aktarim planini kaydeder.
+Bu belge, 20-21 Eylul 2026 tarihlerinde Android uygulamasi ve widget'larinda tamamlanan davranislari ve bunlarin iOS/WidgetKit tarafina aktarim planini kaydeder.
 
 ## Hedef Widget Katalogu
 
@@ -95,7 +95,9 @@ Bu davranis hem bagimsiz Zikirmatik hem de uclu widget icin gecerlidir. iOS'ta `
 
 ### Namaz sayaci
 
-- Sonraki namazin adi gosteriliyor.
+- Sayac sirasi `Gunes -> Ogle -> Ikindi -> Aksam -> Yatsi -> ertesi gun Gunes`.
+- Imsak API verisinde ve vakit listesindeki yerini korur ancak widget geri sayim hedefi degildir.
+- Yatsi gectikten sonra sayac ertesi gunun Gunes vaktine doner.
 - Kalan zaman `H:MM dk` formatinda.
 - Sayac sifira geldiginde negatif deger gostermek yerine sonraki namaza geciyor.
 - Konum, sayacin altinda kucuk ve normal agirlikta gosteriliyor.
@@ -121,6 +123,7 @@ struct CachedPrayerTimes: Codable {
     let timeZone: String
     let date: String
     let imsak: String
+    let gunes: String
     let ogle: String
     let ikindi: String
     let aksam: String
@@ -129,7 +132,113 @@ struct CachedPrayerTimes: Codable {
 }
 ```
 
-Sonraki namaz hesaplamasi uygulama ve widget tarafinda ayni ortak dosyada tutulmali. Gece Yatsi sonrasi ertesi gunun Imsak vaktine gecis ozellikle test edilmeli.
+Sonraki namaz hesaplamasi uygulama ve widget tarafinda ayni ortak dosyada tutulmali. Widget sayacinda Imsak atlanmali; gece Yatsi sonrasi ertesi gunun Gunes vaktine gecis ozellikle test edilmeli.
+
+## 21 Eylul Android Uygulama Tasarimi
+
+Android'in uc ana sayfasi ve Tefsir/Sure detay yuzeyi bastan tasarlandi. iOS uygulamasi yenilenirken ayni bilgi hiyerarsisi korunmali; platformun kendi navigation, sheet ve accessibility davranislari tercih edilmeli.
+
+### Gorsel sistem
+
+- Yalnizca acik tema uygulandi.
+- Tuval: kirik beyaz `#F5F6F2`.
+- Ana yuzey: `#FCFCF8`.
+- Ana metin: koyu komur `#202926`.
+- Ikincil metin: `#59635F`.
+- Ana vurgu: zumrut `#146B52`.
+- Acik zumrut: `#D8E9E0`.
+- Ikincil vurgu: altin `#9A6C1F`.
+- Acik altin: `#F3E8CE`.
+- Baslik ve ayet metinlerinde `Newsreader`, arayuz ve sayilarda `Manrope` kullanildi.
+- Kartlar yalnizca gercek odak yuzeylerinde kullaniliyor; bolumler kart icinde kart yapmiyor.
+- Kose yaricaplari kontrollu: `6`, `8` ve en fazla `12` dp.
+
+iOS karsiligi icin fontlar projeye eklenebilir veya yakin sistem fontlari secilebilir. Dynamic Type test edilmeli; metin boyutu ekran genisligine baglanmamali.
+
+### Uygulama kabugu
+
+- Alt navigasyon: `Gunun Ayeti`, `Zikir`, `Vakitler`.
+- Android deep link `dailyayah://zikirmatik` mevcut davranisini koruyor.
+- Tefsir/Sure detayi acikken alt navigasyon gizleniyor ve detay tam ekrani kullaniyor.
+- Ana sekmelerdeki kaydirma konumu detaydan donuste korunuyor.
+
+iOS'ta `TabView` ana kabuk olabilir. Detaylar tab icinde katman olarak cizilmemeli; `NavigationStack.navigationDestination` ile acilmali.
+
+### Gunun Ayeti sayfasi
+
+- Ayet ana editoryal okuma yuzeyi olarak gosteriliyor.
+- Referans, ayet metni ve kaynak belirgin bir tipografik siraya sahip.
+- Tefsir, sure bilgisi, kopyala ve paylas islemleri menu altinda.
+- Son 15 gun arasinda ileri/geri gecis ve bugune donus korunuyor.
+- Hadis ve dua, ic ice kart yerine tam genislik okuma bolumleri.
+- Loading ve hata durumlari erisilebilir live-region mantigiyla sunuluyor.
+
+### Namaz Vakitleri sayfasi
+
+- Sehir secimi ve yenileme korunuyor.
+- Alti vakit tam genislik satir tablosunda: Imsak, Gunes, Ogle, Ikindi, Aksam, Yatsi.
+- Uygulama sayfasinda siradaki vakit vurgulaniyor; bu liste widget sayaci kuralindan bagimsiz olarak Imsak'i gostermeye devam ediyor.
+- Saat kolonu sabit ve taranabilir bir hiyerarsi kullaniyor.
+
+### Tefsir ve Sure detayi
+
+- Detay tam ekran okuma yuzeyi ve belirgin geri cubugu kullaniyor.
+- Tefsirde Arapca metin, meal ve tefsir ayri bolumler.
+- Sure bilgisinde ayet sayisi, Mushaf sirasi ve Nuzul sirasi toplu metadata yuzeyinde.
+- Yapay alt bosluk kaldirildi; ana bottom bar detay sirasinda gizleniyor.
+
+## Kalici Zikir Profilleri
+
+Zikir sayfasi tek ayari ezmek yerine birden fazla kalici profil sakliyor.
+
+Her profil su alanlara sahip:
+
+```swift
+struct ZikirProfile: Codable, Identifiable {
+    let id: UUID
+    var name: String
+    var target: Int
+    var groupCount: Int
+    var count: Int
+}
+```
+
+Davranislar:
+
+- Yeni profil ad, tur hedefi ve tur sayisiyla kaydedilir.
+- Her profil kendi `count` degerini korur.
+- Listeden profile dokunmak aktif profili degistirir.
+- Aktif profil listede isaretlenir.
+- Birden fazla profil varsa profil silinebilir; son profil silinemez.
+- Eski tekli ayar ilk acilista otomatik olarak ilk profile donusturulur.
+- Widget her zaman aktif profili gosterir.
+- Alt sekme ve kullaniciya gorunen sayfa adi `Zikir`; dahili Android sinif adlari geriye uyumluluk icin `Zikirmatik` kalabilir.
+
+iOS'ta profiller App Group icindeki `Codable` bir liste olarak saklanmali. `activeProfileId` ayri tutulmali; widget timeline'i profil secimi, sayim, sifirlama ve silme sonrasinda yenilenmeli.
+
+### Zikir sayaci geometrisi
+
+- Ana dokunma alani ve progress halkasi ayni `276dp` daireyi kullanir.
+- Icerik padding'i sifirdir; aksi halde progress halkasi arka plan dairesinden kucuk kalir.
+- Halka kalinligi `9dp`, uclari yuvarlaktir.
+- Sayac artirma tum buyuk daireye dokunarak yapilir.
+- Azaltma ve sifirlama altta ayri ikon eylemleridir.
+- Sayac, progress bilgisi ve butonlar erisilebilir aciklamalara sahiptir.
+
+SwiftUI'da arka plan ve progress ayni frame'i paylasmali:
+
+```swift
+ZStack {
+    Circle().fill(Color.primaryContainer)
+    Circle()
+        .trim(from: 0, to: progress)
+        .stroke(Color.primary, style: StrokeStyle(lineWidth: 9, lineCap: .round))
+        .rotationEffect(.degrees(-90))
+    counterContent
+}
+.frame(width: 276, height: 276)
+.contentShape(Circle())
+```
 
 Widget gorunum ayarlari icin onerilen intent alanlari:
 
@@ -159,7 +268,7 @@ Ortak renk, opacity, golge ve tipografi hesaplari tek bir `WidgetAppearance` yar
 ## Uygulama Sirasi
 
 1. Namaz API modeli ve App Group cache katmanini ekle.
-2. Sonraki namaz hesaplamasini ve gece gecisini test et.
+2. Sonraki namaz hesaplamasini `Gunes -> Ogle -> Ikindi -> Aksam -> Yatsi -> Gunes` sirasiyla ve gece gecisiyle test et.
 3. Bes kademeli opacity ile varsayilan kapali golgeyi `AppIntent` olarak tanimla.
 4. Bagimsiz Namaz Vakti widget'ini ekle.
 5. Ayet + Vakit `systemMedium` widget'ini ekle.
@@ -181,7 +290,8 @@ Ortak renk, opacity, golge ve tipografi hesaplari tek bir `WidgetAppearance` yar
 - Namaz sayaci negatif olmamali; vakit dolunca sonraki namaza gecmeli.
 - Konum sayacin altinda gorunmeli.
 - Ag kesildiginde son basarili ayet ve namaz verileri kullanilmali.
-- Gece yarisi ve Yatsi sonrasi Imsak gecisi dogru calismali.
+- Widget sayaci Imsak'i hedef olarak gostermemeli.
+- Gece yarisi ve Yatsi sonrasi ertesi gun Gunes gecisi dogru calismali.
 - WidgetKit preview'lari `systemSmall`, `systemMedium` ve `systemLarge` icin kontrol edilmeli.
 
 ## Android Uygulamasindan Cikarilan Notlar

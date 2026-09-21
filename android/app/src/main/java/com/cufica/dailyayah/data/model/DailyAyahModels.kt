@@ -61,6 +61,17 @@ data class ZikirmatikState(
 }
 
 @Serializable
+data class ZikirProfile(
+    val id: String,
+    val name: String,
+    val target: Int,
+    val groupCount: Int,
+    val count: Int = 0
+) {
+    fun toState() = ZikirmatikState(name, target, groupCount, count)
+}
+
+@Serializable
 data class PrayerTimes(
     val city: String,
     val country: String,

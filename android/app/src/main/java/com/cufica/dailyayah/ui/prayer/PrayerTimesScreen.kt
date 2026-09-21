@@ -39,7 +39,7 @@ import com.cufica.dailyayah.data.model.PrayerTimes
 @Composable
 fun PrayerTimesRoute(viewModel: PrayerTimesViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    PrayerTimesScreen(state, viewModel::selectCity, viewModel::refresh)
+    RedesignedPrayerTimesScreen(state, viewModel::selectCity, viewModel::refresh)
 }
 
 @Composable

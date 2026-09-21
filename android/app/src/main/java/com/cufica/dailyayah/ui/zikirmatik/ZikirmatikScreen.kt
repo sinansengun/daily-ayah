@@ -44,7 +44,19 @@ import com.cufica.dailyayah.data.model.ZikirmatikState
 @Composable
 fun ZikirmatikRoute(viewModel: ZikirmatikViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    ZikirmatikScreen(state, viewModel::increment, viewModel::decrement, viewModel::reset, viewModel::save)
+    val profiles by viewModel.profiles.collectAsStateWithLifecycle()
+    val activeProfileId by viewModel.activeProfileId.collectAsStateWithLifecycle()
+    RedesignedZikirmatikScreen(
+        state = state,
+        profiles = profiles,
+        activeProfileId = activeProfileId,
+        onIncrement = viewModel::increment,
+        onDecrement = viewModel::decrement,
+        onReset = viewModel::reset,
+        onSave = viewModel::save,
+        onSelectProfile = viewModel::selectProfile,
+        onDeleteProfile = viewModel::deleteProfile
+    )
 }
 
 @Composable

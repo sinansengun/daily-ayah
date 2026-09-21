@@ -67,6 +67,11 @@ object DailyAyahWidgetUpdater {
         setTextColor(R.id.widget_next_prayer_name, primaryTextColor)
         setTextColor(R.id.widget_next_prayer_countdown, secondaryTextColor)
         setTextColor(R.id.widget_prayer_location, secondaryTextColor)
+        setInt(
+            R.id.widget_daily_ayah_divider,
+            "setBackgroundColor",
+            if (usesLightText) Color.WHITE else Color.rgb(79, 91, 82)
+        )
         setInt(R.id.widget_daily_ayah_text, "setMaxLines", if (isTwoRows) 9 else 4)
         setTextViewTextSize(
             R.id.widget_daily_ayah_text,
@@ -81,7 +86,7 @@ object DailyAyahWidgetUpdater {
         setTextViewTextSize(
             R.id.widget_next_prayer_name,
             TypedValue.COMPLEX_UNIT_SP,
-            if (isTwoRows) 20f else 17f
+            if (isTwoRows) 20f else 15f
         )
         setTextViewTextSize(
             R.id.widget_next_prayer_countdown,
@@ -106,7 +111,11 @@ object DailyAyahWidgetUpdater {
             setTextViewText(R.id.widget_next_prayer_name, nextPrayer.name)
             setTextViewText(
                 R.id.widget_next_prayer_countdown,
-                "%d:%02d dk".format(remainingMinutes / 60, remainingMinutes % 60)
+                if (isTwoRows) {
+                    "%d:%02d dk".format(remainingMinutes / 60, remainingMinutes % 60)
+                } else {
+                    compactCountdownLabel(remainingMinutes)
+                }
             )
         }
         setTextViewText(R.id.widget_prayer_location, city.orEmpty())
@@ -118,7 +127,7 @@ object DailyAyahWidgetUpdater {
         val now = ZonedDateTime.now(zone)
         val date = maxOf(LocalDate.parse(times.date), now.toLocalDate())
         val prayers = listOf(
-            "İmsak" to times.imsak,
+            "Güneş" to times.gunes,
             "Öğle" to times.ogle,
             "İkindi" to times.ikindi,
             "Akşam" to times.aksam,
@@ -126,7 +135,7 @@ object DailyAyahWidgetUpdater {
         ).map { (name, time) -> NextPrayer(name, date.atTime(LocalTime.parse(time)).atZone(zone)) }
 
         return prayers.firstOrNull { it.dateTime.isAfter(now) }
-            ?: NextPrayer("İmsak", date.plusDays(1).atTime(LocalTime.parse(times.imsak)).atZone(zone))
+            ?: NextPrayer("Güneş", date.plusDays(1).atTime(LocalTime.parse(times.gunes)).atZone(zone))
     }
 
     private fun scheduleCountdownRefresh(context: Context, prayerDateTime: ZonedDateTime) {
@@ -151,6 +160,12 @@ object DailyAyahWidgetUpdater {
     }
 
     private data class NextPrayer(val name: String, val dateTime: ZonedDateTime)
+
+    private fun compactCountdownLabel(remainingMinutes: Long): String {
+        val hours = remainingMinutes / 60
+        val minutes = remainingMinutes % 60
+        return if (hours == 0L) "${minutes}dk" else "${hours}s ${minutes}dk"
+    }
 
     private fun appIntent(context: Context): PendingIntent = PendingIntent.getActivity(
         context,

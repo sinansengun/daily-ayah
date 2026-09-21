@@ -144,14 +144,14 @@ private object WidgetPrayerCountdown {
         val now = ZonedDateTime.now(zone)
         val date = maxOf(LocalDate.parse(times.date), now.toLocalDate())
         val prayers = listOf(
-            "İmsak" to times.imsak,
+            "Güneş" to times.gunes,
             "Öğle" to times.ogle,
             "İkindi" to times.ikindi,
             "Akşam" to times.aksam,
             "Yatsı" to times.yatsi
         ).map { (name, time) -> NextPrayer(name, date.atTime(LocalTime.parse(time)).atZone(zone)) }
         return prayers.firstOrNull { it.dateTime.isAfter(now) }
-            ?: NextPrayer("İmsak", date.plusDays(1).atTime(LocalTime.parse(times.imsak)).atZone(zone))
+            ?: NextPrayer("Güneş", date.plusDays(1).atTime(LocalTime.parse(times.gunes)).atZone(zone))
     }
 
     fun label(nextPrayer: NextPrayer): String {
