@@ -44,21 +44,12 @@ class PrayerTimesViewModel @Inject constructor(
         refresh()
     }
 
-    fun selectCity(city: String) {
-        PrayerWidgetPreferences.setSelectedCity(context, city)
-        mutableState.value = mutableState.value.copy(city = city)
-        DailyAyahWidgetProvider.requestRefresh(context)
-        refresh(forceRefresh = true)
-    }
-
     fun refresh(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             val city = mutableState.value.city
             mutableState.value = mutableState.value.copy(isLoading = true, error = null)
-            val cities = repository.cities()
             val times = repository.load(city, forceRefresh)
             mutableState.value = mutableState.value.copy(
-                cities = cities,
                 times = times,
                 isLoading = false,
                 error = if (times == null) "Namaz vakitleri alınamadı." else null

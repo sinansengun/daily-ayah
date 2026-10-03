@@ -1,9 +1,7 @@
 package com.cufica.dailyayah.ui.prayer
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,19 +11,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.MyLocation
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,12 +39,8 @@ import java.util.Locale
 @Composable
 internal fun RedesignedPrayerTimesScreen(
     state: PrayerTimesUiState,
-    onSelectCity: (String) -> Unit,
-    onRefresh: () -> Unit,
-    onUseDeviceLocation: () -> Unit
+    onRefresh: () -> Unit
 ) {
-    var cityMenuExpanded by remember { mutableStateOf(false) }
-
     DailyAyahBackground {
         Column(
             modifier = Modifier
@@ -68,45 +56,16 @@ internal fun RedesignedPrayerTimesScreen(
                 onRefresh = onRefresh
             )
 
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    "ŞEHİR",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    Icons.Outlined.MyLocation,
+                    contentDescription = "Canlı konum",
+                    tint = MaterialTheme.colorScheme.secondary
                 )
-                Box {
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .clickable { cityMenuExpanded = true }
-                            .background(MaterialTheme.colorScheme.surface)
-                            .padding(horizontal = 14.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(state.city, style = MaterialTheme.typography.titleMedium)
-                        Icon(Icons.Outlined.KeyboardArrowDown, contentDescription = "Şehir seç")
-                    }
-                    DropdownMenu(expanded = cityMenuExpanded, onDismissRequest = { cityMenuExpanded = false }) {
-                        state.cities.forEach { city ->
-                            DropdownMenuItem(
-                                text = { Text(city) },
-                                onClick = { cityMenuExpanded = false; onSelectCity(city) }
-                            )
-                        }
-                    }
-                }
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .clickable(onClick = onUseDeviceLocation)
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(Icons.Outlined.MyLocation, contentDescription = null)
-                    Text("Konumumu kullan", style = MaterialTheme.typography.labelLarge)
-                }
+                Text(state.city, style = MaterialTheme.typography.titleMedium)
             }
 
             when {
@@ -207,7 +166,6 @@ private fun RedesignedPrayerTimesPreview() {
         RedesignedPrayerTimesScreen(
             state = PrayerTimesUiState(
                 city = "İstanbul",
-                cities = listOf("İstanbul", "Ankara", "İzmir"),
                 isLoading = false,
                 times = PrayerTimes(
                     city = "İstanbul",
@@ -224,9 +182,7 @@ private fun RedesignedPrayerTimesPreview() {
                     fetchedAt = "2026-09-21T08:00:00Z"
                 )
             ),
-            onSelectCity = {},
-            onRefresh = {},
-            onUseDeviceLocation = {}
+            onRefresh = {}
         )
     }
 }
