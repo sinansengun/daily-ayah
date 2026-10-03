@@ -121,7 +121,7 @@ fun NotificationSettingsScreen(
             }
         )
         Spacer(modifier = Modifier.height(28.dp))
-        Text("Widget görünümü", style = MaterialTheme.typography.titleLarge)
+        Text("Widget görünümü", style = MaterialTheme.typography.headlineMedium)
         Text(
             "Tüm widget'larda uygulanır",
             modifier = Modifier.padding(top = 4.dp, bottom = 16.dp),

@@ -238,7 +238,7 @@ object PrayerWidgetPreferences {
     fun backgroundOpacity(context: Context, widgetId: Int): Int {
         val storedOpacity = context
             .getSharedPreferences(PreferencesName, Context.MODE_PRIVATE)
-            .getInt(BackgroundOpacityKey, 50)
+            .getInt(BackgroundOpacityKey, 100)
         return ((storedOpacity + 12) / 25 * 25).coerceIn(0, 100)
     }
 
