@@ -67,11 +67,6 @@ object DailyAyahWidgetUpdater {
         setTextColor(R.id.widget_next_prayer_name, primaryTextColor)
         setTextColor(R.id.widget_next_prayer_countdown, secondaryTextColor)
         setTextColor(R.id.widget_prayer_location, secondaryTextColor)
-        setInt(
-            R.id.widget_daily_ayah_divider,
-            "setBackgroundColor",
-            if (usesLightText) Color.WHITE else Color.rgb(79, 91, 82)
-        )
         setInt(R.id.widget_daily_ayah_text, "setMaxLines", if (isTwoRows) 9 else 4)
         setTextViewTextSize(
             R.id.widget_daily_ayah_text,
@@ -127,6 +122,7 @@ object DailyAyahWidgetUpdater {
         val now = ZonedDateTime.now(zone)
         val date = maxOf(LocalDate.parse(times.date), now.toLocalDate())
         val prayers = listOf(
+            "İmsak" to times.imsak,
             "Güneş" to times.gunes,
             "Öğle" to times.ogle,
             "İkindi" to times.ikindi,
@@ -135,7 +131,7 @@ object DailyAyahWidgetUpdater {
         ).map { (name, time) -> NextPrayer(name, date.atTime(LocalTime.parse(time)).atZone(zone)) }
 
         return prayers.firstOrNull { it.dateTime.isAfter(now) }
-            ?: NextPrayer("Güneş", date.plusDays(1).atTime(LocalTime.parse(times.gunes)).atZone(zone))
+            ?: NextPrayer("İmsak", date.plusDays(1).atTime(LocalTime.parse(times.imsak)).atZone(zone))
     }
 
     private fun scheduleCountdownRefresh(context: Context, prayerDateTime: ZonedDateTime) {

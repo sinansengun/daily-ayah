@@ -89,6 +89,8 @@ internal fun RedesignedZikirmatikScreen(
                     } else {
                         "Hedef $target"
                     },
+                    titleFontSize = zikirTitleSize(state.name),
+                    titleLineHeight = zikirTitleLineHeight(state.name),
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = { settingsVisible = true }) {
@@ -176,6 +178,20 @@ internal fun RedesignedZikirmatikScreen(
             }
         )
     }
+}
+
+private fun zikirTitleSize(name: String) = when (name.trim().length) {
+    in 0..20 -> null
+    in 21..50 -> 28.sp
+    in 51..100 -> 24.sp
+    else -> 22.sp
+}
+
+private fun zikirTitleLineHeight(name: String) = when (name.trim().length) {
+    in 0..20 -> 34.sp
+    in 21..50 -> 30.sp
+    in 51..100 -> 26.sp
+    else -> 24.sp
 }
 
 @Composable

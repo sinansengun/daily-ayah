@@ -6,6 +6,8 @@ import com.cufica.dailyayah.data.remote.DailyAyahApi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import java.time.LocalDate
+import java.time.ZoneId
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -17,16 +19,21 @@ class PrayerTimesRepository @Inject constructor(
     private val preferences = context.getSharedPreferences("prayer_times_cache", Context.MODE_PRIVATE)
     private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun load(city: String): PrayerTimes? {
+    suspend fun load(city: String, forceRefresh: Boolean = false): PrayerTimes? {
+        val cached = loadCached(city)
+        if (!forceRefresh && cached?.date == today()) {
+            return cached
+        }
+
         val remote = runCatching {
-        api.fetchPrayerTimes(city).takeIf { it.isSuccessful }?.body()
+            api.fetchPrayerTimes(city).takeIf { it.isSuccessful }?.body()
         }.getOrNull()
         if (remote != null) {
             preferences.edit().putString(city, json.encodeToString(remote)).apply()
             return remote
         }
 
-        return loadCached(city)
+        return cached
     }
 
     fun loadCached(city: String): PrayerTimes? = preferences.getString(city, null)?.let { cached ->
@@ -39,5 +46,6 @@ class PrayerTimesRepository @Inject constructor(
 
     companion object {
         val DefaultCities = listOf("Istanbul", "Ankara", "Izmir", "Bursa", "Antalya")
+        private fun today(): String = LocalDate.now(ZoneId.of("Europe/Istanbul")).toString()
     }
 }

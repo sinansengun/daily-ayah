@@ -1,0 +1,15 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:contentDescription="@null" android:scaleType="fitXY" android:src="@drawable/widget_background" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="8dp">
+        <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:text="Allah'ın rahmetinden ümit kesmeyin." android:textColor="#283038" android:textSize="14sp" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Zümer, 39/53" android:textColor="#283038" android:textSize="11sp" android:textStyle="bold" />
+    </LinearLayout>
+</FrameLayout>

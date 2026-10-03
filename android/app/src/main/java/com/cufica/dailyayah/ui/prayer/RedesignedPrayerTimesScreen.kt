@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -37,15 +38,18 @@ import com.cufica.dailyayah.ui.components.ErrorState
 import com.cufica.dailyayah.ui.components.LoadingState
 import com.cufica.dailyayah.ui.components.ScreenHeader
 import com.cufica.dailyayah.ui.theme.DailyAyahTheme
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 internal fun RedesignedPrayerTimesScreen(
     state: PrayerTimesUiState,
     onSelectCity: (String) -> Unit,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onUseDeviceLocation: () -> Unit
 ) {
     var cityMenuExpanded by remember { mutableStateOf(false) }
 
@@ -60,7 +64,7 @@ internal fun RedesignedPrayerTimesScreen(
             ScreenHeader(
                 eyebrow = "Günlük düzen",
                 title = "Namaz Vakitleri",
-                subtitle = state.times?.date,
+                subtitle = state.times?.date?.let(::prayerTimesFormattedDate),
                 onRefresh = onRefresh
             )
 
@@ -91,6 +95,17 @@ internal fun RedesignedPrayerTimesScreen(
                             )
                         }
                     }
+                }
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .clickable(onClick = onUseDeviceLocation)
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(Icons.Outlined.MyLocation, contentDescription = null)
+                    Text("Konumumu kullan", style = MaterialTheme.typography.labelLarge)
                 }
             }
 
@@ -174,6 +189,17 @@ private fun redesignedNextPrayer(prayers: List<Pair<String, String>>): String {
     }?.first ?: prayers.first().first
 }
 
+private fun prayerTimesFormattedDate(value: String): String = runCatching {
+    LocalDate.parse(value, DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+        .format(DateTimeFormatter.ofPattern("d MMMM EEEE", Locale("tr", "TR")))
+}.recoverCatching {
+    LocalDate.parse(value)
+        .format(DateTimeFormatter.ofPattern("d MMMM EEEE", Locale("tr", "TR")))
+}.recoverCatching {
+    LocalDate.parse(value, DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("tr", "TR")))
+        .format(DateTimeFormatter.ofPattern("d MMMM EEEE", Locale("tr", "TR")))
+}.getOrDefault(value)
+
 @Preview(showBackground = true, widthDp = 390, heightDp = 780)
 @Composable
 private fun RedesignedPrayerTimesPreview() {
@@ -199,7 +225,8 @@ private fun RedesignedPrayerTimesPreview() {
                 )
             ),
             onSelectCity = {},
-            onRefresh = {}
+            onRefresh = {},
+            onUseDeviceLocation = {}
         )
     }
 }

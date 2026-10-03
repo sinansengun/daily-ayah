@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
@@ -50,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -71,12 +73,13 @@ import java.util.Locale
 internal fun RedesignedDailyAyahScreen(
     uiState: DailyAyahUiState,
     onRefresh: () -> Unit,
-    onOpenDetail: (DetailDestination) -> Unit
+    onOpenDetail: (DetailDestination) -> Unit,
+    onOpenSettings: () -> Unit = {}
 ) {
     DailyAyahBackground {
         when {
             uiState.isLoading && uiState.ayah == null -> LoadingState("Günün içeriği hazırlanıyor")
-            uiState.ayah != null -> RedesignedDailyContent(uiState, onRefresh, onOpenDetail)
+            uiState.ayah != null -> RedesignedDailyContent(uiState, onRefresh, onOpenDetail, onOpenSettings)
             else -> ErrorState(uiState.errorMessage.orEmpty(), onRefresh)
         }
     }
@@ -86,7 +89,8 @@ internal fun RedesignedDailyAyahScreen(
 private fun RedesignedDailyContent(
     uiState: DailyAyahUiState,
     onRefresh: () -> Unit,
-    onOpenDetail: (DetailDestination) -> Unit
+    onOpenDetail: (DetailDestination) -> Unit,
+    onOpenSettings: () -> Unit
 ) {
     val items = remember(uiState.ayah, uiState.history) {
         listOfNotNull(uiState.ayah)
@@ -106,10 +110,26 @@ private fun RedesignedDailyContent(
             eyebrow = "Günün seçkisi",
             title = "Günün Ayeti",
             subtitle = redesignFormattedDate(ayah.publishedDateTR),
-            onRefresh = onRefresh
+            onSettings = onOpenSettings
         )
 
         AnimatedContent(
+            modifier = Modifier
+                .fillMaxWidth()
+                .pointerInput(selectedIndex, items.size) {
+                    var horizontalDrag = 0f
+                    detectHorizontalDragGestures(
+                        onHorizontalDrag = { _, dragAmount -> horizontalDrag += dragAmount },
+                        onDragEnd = {
+                            when {
+                                horizontalDrag <= -80f && selectedIndex < items.lastIndex -> selectedIndex += 1
+                                horizontalDrag >= 80f && selectedIndex > 0 -> selectedIndex -= 1
+                            }
+                            horizontalDrag = 0f
+                        },
+                        onDragCancel = { horizontalDrag = 0f }
+                    )
+                },
             targetState = ayah,
             transitionSpec = {
                 val older = targetState.publishedDateTR < initialState.publishedDateTR
@@ -300,7 +320,8 @@ private fun DailyAyahPreview() {
                 )
             ),
             onRefresh = {},
-            onOpenDetail = {}
+            onOpenDetail = {},
+            onOpenSettings = {}
         )
     }
 }

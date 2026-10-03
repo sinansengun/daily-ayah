@@ -24,7 +24,7 @@ builder.Services.AddHttpClient<IDiyanetScraper, DiyanetScraper>(client =>
 });
 builder.Services.AddHttpClient<PrayerTimesService>(client =>
 {
-    client.BaseAddress = new Uri("https://api.aladhan.com/");
+    client.BaseAddress = new Uri("https://namazvakitleri.diyanet.gov.tr/");
     client.Timeout = TimeSpan.FromSeconds(15);
 });
 

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
@@ -28,6 +29,7 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.TextUnit
 import com.cufica.dailyayah.R
 
 @Composable
@@ -56,6 +58,9 @@ fun ScreenHeader(
     title: String,
     subtitle: String? = null,
     onRefresh: (() -> Unit)? = null,
+    onSettings: (() -> Unit)? = null,
+    titleFontSize: TextUnit? = null,
+    titleLineHeight: TextUnit? = null,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -69,12 +74,22 @@ fun ScreenHeader(
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.secondary
             )
-            Text(text = title, style = MaterialTheme.typography.headlineLarge)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontSize = titleFontSize ?: MaterialTheme.typography.headlineLarge.fontSize,
+                    lineHeight = titleLineHeight ?: MaterialTheme.typography.headlineLarge.lineHeight
+                )
+            )
             subtitle?.let {
                 Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-        onRefresh?.let { refresh ->
+        onSettings?.let { settings ->
+            IconButton(onClick = settings) {
+                Icon(Icons.Outlined.Settings, contentDescription = "Bildirim ayarları")
+            }
+        } ?: onRefresh?.let { refresh ->
             IconButton(onClick = refresh) {
                 Icon(Icons.Outlined.Refresh, contentDescription = "Yenile")
             }

@@ -1,7 +1,12 @@
 package com.cufica.dailyayah
 
+import android.Manifest
 import android.os.Bundle
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
@@ -32,35 +37,65 @@ import com.cufica.dailyayah.ui.daily.DetailScreen
 import com.cufica.dailyayah.ui.theme.DailyAyahTheme
 import com.cufica.dailyayah.ui.zikirmatik.ZikirmatikRoute
 import com.cufica.dailyayah.ui.prayer.PrayerTimesRoute
+import com.cufica.dailyayah.ui.settings.NotificationSettingsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private var notificationPermissionGranted by mutableStateOf(false)
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted -> notificationPermissionGranted = granted }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        notificationPermissionGranted = notificationPermissionGranted()
+        requestNotificationPermission()
         val opensZikirmatik = intent?.data?.host == "zikirmatik"
         setContent {
             DailyAyahTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    DailyAyahApp(opensZikirmatik)
+                    DailyAyahApp(
+                        opensZikirmatik,
+                        notificationPermissionGranted,
+                        ::requestNotificationPermission
+                    )
                 }
             }
         }
     }
+
+    private fun requestNotificationPermission() {
+        if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private fun notificationPermissionGranted(): Boolean =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
 }
 
 @Composable
-private fun DailyAyahApp(opensZikirmatik: Boolean) {
+private fun DailyAyahApp(
+    opensZikirmatik: Boolean,
+    notificationPermissionGranted: Boolean,
+    onRequestNotificationPermission: () -> Unit
+) {
     var selectedTab by rememberSaveable { mutableIntStateOf(if (opensZikirmatik) 1 else 0) }
     var detailDestination by remember { mutableStateOf<DetailDestination?>(null) }
+    var settingsVisible by rememberSaveable { mutableStateOf(false) }
 
-    BackHandler(enabled = selectedTab != 0) {
-        selectedTab = 0
+    BackHandler(enabled = settingsVisible || selectedTab != 0) {
+        if (settingsVisible) settingsVisible = false else selectedTab = 0
     }
 
     Scaffold(
         bottomBar = {
-            if (detailDestination == null) NavigationBar {
+            if (detailDestination == null && !settingsVisible) NavigationBar {
             NavigationBarItem(
                 selected = selectedTab == 0,
                 onClick = { selectedTab = 0 },
@@ -86,12 +121,23 @@ private fun DailyAyahApp(opensZikirmatik: Boolean) {
         }
     ) { contentPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(contentPadding)) {
-            detailDestination?.let { destination ->
-                DetailScreen(destination, onBack = { detailDestination = null })
-            } ?: when (selectedTab) {
-                0 -> DailyAyahRoute(onOpenDetail = { detailDestination = it })
-                1 -> ZikirmatikRoute()
-                else -> PrayerTimesRoute()
+            when {
+                detailDestination != null -> DetailScreen(
+                    detailDestination!!,
+                    onBack = { detailDestination = null }
+                )
+                settingsVisible -> NotificationSettingsScreen(
+                    notificationPermissionGranted = notificationPermissionGranted,
+                    onRequestNotificationPermission = onRequestNotificationPermission
+                )
+                else -> when (selectedTab) {
+                    0 -> DailyAyahRoute(
+                        onOpenDetail = { detailDestination = it },
+                        onOpenSettings = { settingsVisible = true }
+                    )
+                    1 -> ZikirmatikRoute()
+                    else -> PrayerTimesRoute()
+                }
             }
         }
     }

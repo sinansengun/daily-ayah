@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using DailyAyah.Api.Config;
 using DailyAyah.Api.Models;
 using Microsoft.Extensions.Caching.Memory;
@@ -8,60 +9,87 @@ namespace DailyAyah.Api.Services;
 
 public sealed class PrayerTimesService(HttpClient client, IMemoryCache cache)
 {
-    private const string Source = "AlAdhan - Diyanet Isleri Baskanligi method";
-    private static readonly IReadOnlyDictionary<string, PrayerCity> Cities = new Dictionary<string, PrayerCity>(StringComparer.OrdinalIgnoreCase)
-    {
-        ["Istanbul"] = new("Istanbul", 41.0082, 28.9784),
-        ["Ankara"] = new("Ankara", 39.9334, 32.8597),
-        ["Izmir"] = new("Izmir", 38.4237, 27.1428),
-        ["Bursa"] = new("Bursa", 40.1950, 29.0600),
-        ["Antalya"] = new("Antalya", 36.8969, 30.7133)
-    };
+    private const string Source = "Diyanet İşleri Başkanlığı";
+    private const string LocationsPath = "assets/locations/TURKEY.json";
+    private static readonly string[] DefaultCities = ["Istanbul", "Ankara", "Izmir", "Bursa", "Antalya"];
 
-    public IReadOnlyCollection<string> SupportedCities => Cities.Keys.ToArray();
+    public IReadOnlyCollection<string> SupportedCities => DefaultCities;
 
     public async Task<PrayerTimesResponse> GetAsync(string? city, CancellationToken cancellationToken)
     {
-        var resolvedCity = Cities.TryGetValue(city?.Trim() ?? string.Empty, out var value)
-            ? value
-            : Cities["Istanbul"];
+        var locations = await GetLocationsAsync(cancellationToken);
+        var requestedCity = city?.Trim();
+        var resolvedCity = locations.FirstOrDefault(location => NamesMatch(location.City, requestedCity))
+            ?? locations.FirstOrDefault(location => NamesMatch(location.State, requestedCity))
+            ?? locations.First(location => NamesMatch(location.City, "Istanbul"));
         var turkeyTimeZone = TimeZoneInfo.FindSystemTimeZoneById(AppConstants.TurkeyTimeZone);
         var today = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, turkeyTimeZone).Date;
-        var cacheKey = $"prayer-times:{resolvedCity.Name}:{today:yyyy-MM-dd}";
+        var cacheKey = $"prayer-times:{resolvedCity.CityId}:{today:yyyy-MM-dd}";
 
         return await cache.GetOrCreateAsync(cacheKey, async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(6);
-            var date = today.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
-            var requestUri = $"v1/timings/{date}?latitude={resolvedCity.Latitude.ToString(CultureInfo.InvariantCulture)}&longitude={resolvedCity.Longitude.ToString(CultureInfo.InvariantCulture)}&method=13&timezonestring={AppConstants.TurkeyTimeZone}";
+            var requestUri = $"tr-TR/{resolvedCity.CityId}";
             using var response = await client.GetAsync(requestUri, cancellationToken);
             response.EnsureSuccessStatusCode();
 
-            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-            using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
-            var timings = document.RootElement.GetProperty("data").GetProperty("timings");
+            var page = await response.Content.ReadAsStringAsync(cancellationToken);
 
             return new PrayerTimesResponse(
-                resolvedCity.Name,
+                ToDisplayName(resolvedCity.City),
                 "Türkiye",
                 today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 AppConstants.TurkeyTimeZone,
-                ReadTime(timings, "Fajr"),
-                ReadTime(timings, "Sunrise"),
-                ReadTime(timings, "Dhuhr"),
-                ReadTime(timings, "Asr"),
-                ReadTime(timings, "Maghrib"),
-                ReadTime(timings, "Isha"),
+                ReadTime(page, "imsak"),
+                ReadTime(page, "gunes"),
+                ReadTime(page, "ogle"),
+                ReadTime(page, "ikindi"),
+                ReadTime(page, "aksam"),
+                ReadTime(page, "yatsi"),
                 Source,
                 DateTimeOffset.UtcNow.ToString("O")
             );
         }) ?? throw new InvalidOperationException("Prayer times could not be loaded.");
     }
 
-    private static string ReadTime(JsonElement timings, string name) => timings
-        .GetProperty(name)
-        .GetString()?
-        .Split(' ', StringSplitOptions.RemoveEmptyEntries)[0] ?? string.Empty;
+    private async Task<IReadOnlyList<DiyanetLocation>> GetLocationsAsync(CancellationToken cancellationToken)
+    {
+        const string cacheKey = "diyanet-turkey-locations";
+        return await cache.GetOrCreateAsync(cacheKey, async entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(7);
+            await using var stream = await client.GetStreamAsync(LocationsPath, cancellationToken);
+            return await JsonSerializer.DeserializeAsync<List<DiyanetLocation>>(stream, cancellationToken: cancellationToken)
+                ?? throw new InvalidOperationException("Diyanet district list could not be loaded.");
+        }) ?? throw new InvalidOperationException("Diyanet district list could not be loaded.");
+    }
 
-    private sealed record PrayerCity(string Name, double Latitude, double Longitude);
+    private static string ReadTime(string page, string key)
+    {
+        var match = Regex.Match(page, $"var _{key}Time = \\\"(?<time>\\d{{2}}:\\d{{2}})\\\";", RegexOptions.CultureInvariant);
+        if (!match.Success)
+        {
+            throw new InvalidOperationException($"Diyanet page did not contain the {key} prayer time.");
+        }
+
+        return match.Groups["time"].Value;
+    }
+
+    private static bool NamesMatch(string value, string? candidate) =>
+        candidate is not null && string.Equals(NormalizeName(value), NormalizeName(candidate), StringComparison.Ordinal);
+
+    private static string NormalizeName(string value) => value
+        .Trim()
+        .ToUpperInvariant()
+        .Replace('İ', 'I')
+        .Replace('I', 'I')
+        .Replace('Ç', 'C')
+        .Replace('Ğ', 'G')
+        .Replace('Ö', 'O')
+        .Replace('Ş', 'S')
+        .Replace('Ü', 'U');
+
+    private static string ToDisplayName(string value) => CultureInfo.GetCultureInfo("tr-TR").TextInfo.ToTitleCase(value.ToLowerInvariant());
+
+    private sealed record DiyanetLocation(string Country, string State, string City, int CityId);
 }

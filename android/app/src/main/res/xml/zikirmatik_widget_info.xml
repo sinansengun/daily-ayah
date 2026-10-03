@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialLayout="@layout/widget_zikirmatik"
+    android:previewImage="@drawable/widget_preview"
+    android:previewLayout="@layout/widget_preview_zikirmatik"
     android:configure="com.cufica.dailyayah.widget.DailyAyahWidgetConfigActivity"
     android:minWidth="57dp"
     android:minHeight="50dp"

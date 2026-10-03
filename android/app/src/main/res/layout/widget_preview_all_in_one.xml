@@ -1,0 +1,21 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:contentDescription="@null" android:scaleType="fitXY" android:src="@drawable/widget_background" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center_vertical" android:orientation="horizontal" android:paddingHorizontal="12dp" android:paddingVertical="7dp">
+        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="2" android:gravity="center_vertical" android:orientation="vertical">
+            <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:text="Allah'ın rahmetinden ümit kesmeyin." android:textColor="#283038" android:textSize="10sp" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Zümer, 39/53" android:textColor="#283038" android:textSize="9sp" android:textStyle="bold" />
+        </LinearLayout>
+        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="0.9" android:gravity="center" android:orientation="vertical">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="İmsak" android:textColor="#283038" android:textSize="14sp" android:textStyle="bold" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="5:12" android:textColor="#56616B" android:textSize="15sp" android:textStyle="bold" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="İstanbul" android:textColor="#56616B" android:textSize="8sp" />
+        </LinearLayout>
+        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="0.8" android:gravity="center" android:orientation="vertical">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="33" android:textColor="#283038" android:textSize="22sp" android:textStyle="bold" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="Subhanallah" android:textColor="#283038" android:textSize="9sp" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="Hedef: 33" android:textColor="#56616B" android:textSize="10sp" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

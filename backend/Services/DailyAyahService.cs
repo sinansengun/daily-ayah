@@ -71,6 +71,11 @@ public sealed class DailyAyahService
 
         var nowUtc = DateTimeOffset.UtcNow;
         var record = BuildRecord(scraped, nowUtc);
+        if (_store.IsConfigured)
+        {
+            var recentRecords = await _store.GetHistoryAsync(30, cancellationToken);
+            record = SelectFallbackForDuplicate(record, recentRecords, nowUtc);
+        }
         await _store.UpsertAsync(record, cancellationToken);
 
         _current = record;
@@ -148,6 +153,44 @@ public sealed class DailyAyahService
             fetchedAt,
             ComputeSha256(fingerprint)
         );
+    }
+
+    private DailyAyahRecord SelectFallbackForDuplicate(
+        DailyAyahRecord scrapedRecord,
+        IReadOnlyList<DailyAyahRecord> recentRecords,
+        DateTimeOffset nowUtc)
+    {
+        var isDuplicate = recentRecords.Any(record =>
+            string.Equals(record.Text, scrapedRecord.Text, StringComparison.Ordinal) &&
+            string.Equals(record.Reference, scrapedRecord.Reference, StringComparison.Ordinal));
+
+        if (!isDuplicate)
+        {
+            return scrapedRecord;
+        }
+
+        var candidates = recentRecords
+            .Where(record =>
+                !string.Equals(record.Text, scrapedRecord.Text, StringComparison.Ordinal) ||
+                !string.Equals(record.Reference, scrapedRecord.Reference, StringComparison.Ordinal))
+            .ToArray();
+
+        if (candidates.Length == 0)
+        {
+            return scrapedRecord;
+        }
+
+        var selected = candidates[Random.Shared.Next(candidates.Length)];
+        var publishedDateTR = GetTurkeyDateIso(nowUtc);
+        var fetchedAt = nowUtc.UtcDateTime.ToString("O", CultureInfo.InvariantCulture);
+        var fingerprint = $"{selected.Text}|{selected.Reference}|{selected.HadithText ?? string.Empty}|{selected.HadithReference ?? string.Empty}|{selected.DuaText ?? string.Empty}|{selected.DuaReference ?? string.Empty}|{publishedDateTR}";
+
+        return selected with
+        {
+            PublishedDateTR = publishedDateTR,
+            FetchedAt = fetchedAt,
+            Hash = ComputeSha256(fingerprint)
+        };
     }
 
     private void UpsertHistory(DailyAyahRecord record)

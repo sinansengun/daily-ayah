@@ -72,13 +72,15 @@ import java.util.Locale
 @Composable
 fun DailyAyahRoute(
     onOpenDetail: (DetailDestination) -> Unit = {},
+    onOpenSettings: () -> Unit = {},
     viewModel: DailyAyahViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     RedesignedDailyAyahScreen(
         uiState = uiState,
         onRefresh = viewModel::refresh,
-        onOpenDetail = onOpenDetail
+        onOpenDetail = onOpenDetail,
+        onOpenSettings = onOpenSettings
     )
 }
 
