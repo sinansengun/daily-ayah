@@ -24,12 +24,12 @@ public sealed class PrayerTimesService(HttpClient client, IMemoryCache cache)
             ?? locations.First(location => NamesMatch(location.City, "Istanbul"));
         var turkeyTimeZone = TimeZoneInfo.FindSystemTimeZoneById(AppConstants.TurkeyTimeZone);
         var today = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, turkeyTimeZone).Date;
-        var cacheKey = $"prayer-times:{resolvedCity.CityId}:{today:yyyy-MM-dd}";
+        var cacheKey = $"prayer-times:{resolvedCity.CityID}:{today:yyyy-MM-dd}";
 
         return await cache.GetOrCreateAsync(cacheKey, async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(6);
-            var requestUri = $"tr-TR/{resolvedCity.CityId}";
+            var requestUri = $"tr-TR/{resolvedCity.CityID}";
             using var response = await client.GetAsync(requestUri, cancellationToken);
             response.EnsureSuccessStatusCode();
 
@@ -91,5 +91,5 @@ public sealed class PrayerTimesService(HttpClient client, IMemoryCache cache)
 
     private static string ToDisplayName(string value) => CultureInfo.GetCultureInfo("tr-TR").TextInfo.ToTitleCase(value.ToLowerInvariant());
 
-    private sealed record DiyanetLocation(string Country, string State, string City, int CityId);
+    private sealed record DiyanetLocation(string Country, string State, string City, int CityID);
 }
