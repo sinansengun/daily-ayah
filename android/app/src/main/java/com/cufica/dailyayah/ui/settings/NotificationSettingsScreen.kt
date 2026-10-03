@@ -15,11 +15,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -161,39 +159,21 @@ fun NotificationSettingsScreen(
             },
             onClick = { }
         )
-        Text("Yazı rengi", style = MaterialTheme.typography.titleMedium)
-        WidgetTextColorOption(
-            label = "Koyu yazı rengi",
-            selected = widgetDarkTextEnabled,
-            onSelect = {
-                widgetDarkTextEnabled = true
-                PrayerWidgetPreferences.setDarkTextEnabled(context, true)
-                refreshWidgets(context)
-            }
+        PreferenceRow(
+            title = "Koyu yazı rengi",
+            subtitle = if (widgetDarkTextEnabled) "Açık" else "Kapalı",
+            trailing = {
+                Switch(
+                    checked = widgetDarkTextEnabled,
+                    onCheckedChange = { checked ->
+                        widgetDarkTextEnabled = checked
+                        PrayerWidgetPreferences.setDarkTextEnabled(context, checked)
+                        refreshWidgets(context)
+                    }
+                )
+            },
+            onClick = { }
         )
-        WidgetTextColorOption(
-            label = "Açık yazı rengi",
-            selected = !widgetDarkTextEnabled,
-            onSelect = {
-                widgetDarkTextEnabled = false
-                PrayerWidgetPreferences.setDarkTextEnabled(context, false)
-                refreshWidgets(context)
-            }
-        )
-    }
-}
-
-@Composable
-private fun WidgetTextColorOption(label: String, selected: Boolean, onSelect: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .selectable(selected = selected, onClick = onSelect)
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(selected = selected, onClick = onSelect)
-        Text(label, modifier = Modifier.padding(start = 8.dp), style = MaterialTheme.typography.bodyLarge)
     }
 }
 
