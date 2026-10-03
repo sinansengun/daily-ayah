@@ -6,14 +6,21 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +35,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import com.cufica.dailyayah.notification.DailyAyahNotificationPreferences
 import com.cufica.dailyayah.notification.DailyAyahNotificationScheduler
+import com.cufica.dailyayah.widget.AllInOneWidgetProvider
+import com.cufica.dailyayah.widget.DailyAyahOnlyWidgetProvider
+import com.cufica.dailyayah.widget.DailyAyahWidgetProvider
+import com.cufica.dailyayah.widget.PrayerOnlyWidgetProvider
+import com.cufica.dailyayah.widget.PrayerWidgetPreferences
+import com.cufica.dailyayah.widget.ZikirmatikWidgetUpdater
 import java.time.LocalTime
 import java.util.Locale
 
@@ -39,11 +52,15 @@ fun NotificationSettingsScreen(
     val context = LocalContext.current
     var enabled by remember { mutableStateOf(DailyAyahNotificationPreferences.isEnabled(context)) }
     var deliveryTime by remember { mutableStateOf(DailyAyahNotificationPreferences.time(context)) }
+    var widgetOpacity by remember { mutableStateOf(PrayerWidgetPreferences.backgroundOpacity(context, 0).toFloat()) }
+    var widgetTextShadowEnabled by remember { mutableStateOf(PrayerWidgetPreferences.textShadowEnabled(context, 0)) }
+    var widgetDarkTextEnabled by remember { mutableStateOf(PrayerWidgetPreferences.darkTextEnabled(context)) }
     val notificationsEnabled = notificationPermissionGranted && NotificationManagerCompat.from(context).areNotificationsEnabled()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
@@ -105,7 +122,87 @@ fun NotificationSettingsScreen(
                 }
             }
         )
+        Spacer(modifier = Modifier.height(28.dp))
+        Text("Widget görünümü", style = MaterialTheme.typography.titleLarge)
+        Text(
+            "Tüm widget'larda uygulanır",
+            modifier = Modifier.padding(top = 4.dp, bottom = 16.dp),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text("Arka plan yoğunluğu", style = MaterialTheme.typography.titleMedium)
+        Slider(
+            value = widgetOpacity,
+            onValueChange = { widgetOpacity = it },
+            onValueChangeFinished = {
+                PrayerWidgetPreferences.setBackgroundOpacity(context, 0, widgetOpacity.toInt())
+                refreshWidgets(context)
+            },
+            valueRange = 0f..100f,
+            steps = 3
+        )
+        Text(
+            "%${widgetOpacity.toInt()}",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        PreferenceRow(
+            title = "Metin gölgesi",
+            subtitle = if (widgetTextShadowEnabled) "Açık" else "Kapalı",
+            trailing = {
+                Switch(
+                    checked = widgetTextShadowEnabled,
+                    onCheckedChange = { checked ->
+                        widgetTextShadowEnabled = checked
+                        PrayerWidgetPreferences.setTextShadowEnabled(context, 0, checked)
+                        refreshWidgets(context)
+                    }
+                )
+            },
+            onClick = { }
+        )
+        Text("Yazı rengi", style = MaterialTheme.typography.titleMedium)
+        WidgetTextColorOption(
+            label = "Koyu yazı rengi",
+            selected = widgetDarkTextEnabled,
+            onSelect = {
+                widgetDarkTextEnabled = true
+                PrayerWidgetPreferences.setDarkTextEnabled(context, true)
+                refreshWidgets(context)
+            }
+        )
+        WidgetTextColorOption(
+            label = "Açık yazı rengi",
+            selected = !widgetDarkTextEnabled,
+            onSelect = {
+                widgetDarkTextEnabled = false
+                PrayerWidgetPreferences.setDarkTextEnabled(context, false)
+                refreshWidgets(context)
+            }
+        )
     }
+}
+
+@Composable
+private fun WidgetTextColorOption(label: String, selected: Boolean, onSelect: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .selectable(selected = selected, onClick = onSelect)
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(selected = selected, onClick = onSelect)
+        Text(label, modifier = Modifier.padding(start = 8.dp), style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+private fun refreshWidgets(context: Context) {
+    DailyAyahWidgetProvider.requestRefresh(context)
+    DailyAyahOnlyWidgetProvider.requestRefresh(context)
+    PrayerOnlyWidgetProvider.requestRefresh(context)
+    AllInOneWidgetProvider.requestRefresh(context)
+    ZikirmatikWidgetUpdater.updateFromStoredState(context)
 }
 
 @Composable

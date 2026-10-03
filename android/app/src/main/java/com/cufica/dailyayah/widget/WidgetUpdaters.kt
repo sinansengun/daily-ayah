@@ -59,9 +59,9 @@ object DailyAyahWidgetUpdater {
             "setImageAlpha",
             backgroundOpacity * 255 / 100
         )
-        val usesLightText = backgroundOpacity < 50
-        val primaryTextColor = if (usesLightText) Color.WHITE else Color.rgb(40, 48, 56)
-        val secondaryTextColor = if (usesLightText) Color.WHITE else Color.rgb(86, 97, 107)
+        val usesDarkText = PrayerWidgetPreferences.darkTextEnabled(context)
+        val primaryTextColor = if (usesDarkText) Color.rgb(40, 48, 56) else Color.WHITE
+        val secondaryTextColor = if (usesDarkText) Color.rgb(86, 97, 107) else Color.WHITE
         setTextColor(R.id.widget_daily_ayah_text, primaryTextColor)
         setTextColor(R.id.widget_daily_ayah_reference, primaryTextColor)
         setTextColor(R.id.widget_next_prayer_name, primaryTextColor)
@@ -179,8 +179,8 @@ object DailyAyahOnlyWidgetUpdater {
             val options = manager.getAppWidgetOptions(widgetId)
             val isTwoRows = options.isTwoRowWidget()
             val backgroundOpacity = PrayerWidgetPreferences.backgroundOpacity(context, widgetId)
-            val usesLightText = backgroundOpacity < 50
-            val primaryTextColor = if (usesLightText) Color.WHITE else Color.rgb(40, 48, 56)
+            val usesDarkText = PrayerWidgetPreferences.darkTextEnabled(context)
+            val primaryTextColor = if (usesDarkText) Color.rgb(40, 48, 56) else Color.WHITE
             val layoutId = if (PrayerWidgetPreferences.textShadowEnabled(context, widgetId)) {
                 R.layout.widget_daily_ayah_only_shadow
             } else {
@@ -220,8 +220,9 @@ object DailyAyahOnlyWidgetUpdater {
 object PrayerWidgetPreferences {
     private const val PreferencesName = "prayer_widget"
     private const val CityKey = "city"
-    private const val BackgroundOpacityPrefix = "background_opacity_"
-    private const val TextShadowPrefix = "text_shadow_"
+    private const val BackgroundOpacityKey = "background_opacity"
+    private const val TextShadowKey = "text_shadow"
+    private const val DarkTextKey = "dark_text"
 
     fun selectedCity(context: Context): String = context
         .getSharedPreferences(PreferencesName, Context.MODE_PRIVATE)
@@ -237,7 +238,7 @@ object PrayerWidgetPreferences {
     fun backgroundOpacity(context: Context, widgetId: Int): Int {
         val storedOpacity = context
             .getSharedPreferences(PreferencesName, Context.MODE_PRIVATE)
-            .getInt("$BackgroundOpacityPrefix$widgetId", 50)
+            .getInt(BackgroundOpacityKey, 50)
         return ((storedOpacity + 12) / 25 * 25).coerceIn(0, 100)
     }
 
@@ -245,27 +246,34 @@ object PrayerWidgetPreferences {
         val steppedOpacity = ((opacity + 12) / 25 * 25).coerceIn(0, 100)
         context.getSharedPreferences(PreferencesName, Context.MODE_PRIVATE)
             .edit()
-            .putInt("$BackgroundOpacityPrefix$widgetId", steppedOpacity)
+            .putInt(BackgroundOpacityKey, steppedOpacity)
             .apply()
     }
 
     fun textShadowEnabled(context: Context, widgetId: Int): Boolean = context
         .getSharedPreferences(PreferencesName, Context.MODE_PRIVATE)
-        .getBoolean("$TextShadowPrefix$widgetId", false)
+        .getBoolean(TextShadowKey, false)
 
     fun setTextShadowEnabled(context: Context, widgetId: Int, enabled: Boolean) {
         context.getSharedPreferences(PreferencesName, Context.MODE_PRIVATE)
             .edit()
-            .putBoolean("$TextShadowPrefix$widgetId", enabled)
+            .putBoolean(TextShadowKey, enabled)
+            .apply()
+    }
+
+    fun darkTextEnabled(context: Context): Boolean = context
+        .getSharedPreferences(PreferencesName, Context.MODE_PRIVATE)
+        .getBoolean(DarkTextKey, true)
+
+    fun setDarkTextEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PreferencesName, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(DarkTextKey, enabled)
             .apply()
     }
 
     fun removeWidget(context: Context, widgetId: Int) {
-        context.getSharedPreferences(PreferencesName, Context.MODE_PRIVATE)
-            .edit()
-            .remove("$BackgroundOpacityPrefix$widgetId")
-            .remove("$TextShadowPrefix$widgetId")
-            .apply()
+        // Widget appearance is shared by every widget instance.
     }
 }
 
@@ -322,9 +330,9 @@ object ZikirmatikWidgetUpdater {
             options.isTwoRowWidget()
         val backgroundOpacity = PrayerWidgetPreferences.backgroundOpacity(context, widgetId)
         setInt(R.id.widget_zikirmatik_background, "setImageAlpha", backgroundOpacity * 255 / 100)
-        val usesLightText = backgroundOpacity < 50
-        val primaryTextColor = if (usesLightText) Color.WHITE else Color.rgb(40, 48, 56)
-        val secondaryTextColor = if (usesLightText) Color.WHITE else Color.rgb(86, 97, 107)
+        val usesDarkText = PrayerWidgetPreferences.darkTextEnabled(context)
+        val primaryTextColor = if (usesDarkText) Color.rgb(40, 48, 56) else Color.WHITE
+        val secondaryTextColor = if (usesDarkText) Color.rgb(86, 97, 107) else Color.WHITE
         setTextColor(R.id.widget_zikirmatik_count, primaryTextColor)
         setTextColor(R.id.widget_zikirmatik_name, primaryTextColor)
         setTextColor(R.id.widget_zikirmatik_target, secondaryTextColor)

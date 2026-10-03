@@ -31,9 +31,9 @@ object PrayerOnlyWidgetUpdater {
         manager.getAppWidgetIds(component).forEach { widgetId ->
             val isTwoRows = manager.getAppWidgetOptions(widgetId).isTwoRowWidget()
             val opacity = PrayerWidgetPreferences.backgroundOpacity(context, widgetId)
-            val lightText = opacity < 50
-            val primary = if (lightText) Color.WHITE else Color.rgb(40, 48, 56)
-            val secondary = if (lightText) Color.WHITE else Color.rgb(86, 97, 107)
+            val usesDarkText = PrayerWidgetPreferences.darkTextEnabled(context)
+            val primary = if (usesDarkText) Color.rgb(40, 48, 56) else Color.WHITE
+            val secondary = if (usesDarkText) Color.rgb(86, 97, 107) else Color.WHITE
             val layoutId = if (PrayerWidgetPreferences.textShadowEnabled(context, widgetId)) {
                 R.layout.widget_prayer_only_shadow
             } else {
@@ -74,9 +74,9 @@ object AllInOneWidgetUpdater {
         manager.getAppWidgetIds(component).forEach { widgetId ->
             val isTwoRows = manager.getAppWidgetOptions(widgetId).isTwoRowWidget()
             val opacity = PrayerWidgetPreferences.backgroundOpacity(context, widgetId)
-            val lightText = opacity < 50
-            val primary = if (lightText) Color.WHITE else Color.rgb(40, 48, 56)
-            val secondary = if (lightText) Color.WHITE else Color.rgb(86, 97, 107)
+            val usesDarkText = PrayerWidgetPreferences.darkTextEnabled(context)
+            val primary = if (usesDarkText) Color.rgb(40, 48, 56) else Color.WHITE
+            val secondary = if (usesDarkText) Color.rgb(86, 97, 107) else Color.WHITE
             val layoutId = if (PrayerWidgetPreferences.textShadowEnabled(context, widgetId)) {
                 R.layout.widget_all_in_one_shadow
             } else {
