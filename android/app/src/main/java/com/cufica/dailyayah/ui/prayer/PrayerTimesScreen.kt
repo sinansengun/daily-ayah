@@ -54,7 +54,7 @@ fun PrayerTimesRoute(viewModel: PrayerTimesViewModel = hiltViewModel()) {
     RedesignedPrayerTimesScreen(
         state,
         viewModel::selectCity,
-        viewModel::refresh,
+        onRefresh = { viewModel.refresh(forceRefresh = true) },
         onUseDeviceLocation = {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
