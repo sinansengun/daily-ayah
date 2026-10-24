@@ -7,23 +7,32 @@ using DailyAyah.Api.Models;
 
 namespace DailyAyah.Api.Scraper;
 
+public sealed class SourceNotUpdatedException(string message) : InvalidOperationException(message);
+
 public sealed class DiyanetScraper(HttpClient httpClient) : IDiyanetScraper
 {
+    private const int MaxNetworkAttempts = 4;
+    private const int MaxSourceNotUpdatedAttempts = 10;
     private static readonly Regex ReferenceRegex = new(@"\(([^()]{2,140})\)", RegexOptions.Compiled);
+    private static readonly TimeZoneInfo TurkeyTimeZone = TimeZoneInfo.FindSystemTimeZoneById(AppConstants.TurkeyTimeZone);
 
     public async Task<ScrapedAyah> FetchDailyAyahAsync(CancellationToken cancellationToken = default)
     {
-        const int maxAttempts = 4;
         for (var attempt = 1; ; attempt++)
         {
             try
             {
                 return await FetchDailyContentOnceAsync(cancellationToken);
             }
-            catch (HttpRequestException) when (attempt < maxAttempts)
+            catch (HttpRequestException) when (attempt < MaxNetworkAttempts)
             {
                 // Diyanet intermittently resets connections; retry with backoff.
                 await Task.Delay(TimeSpan.FromSeconds(attempt * 2), cancellationToken);
+            }
+            catch (SourceNotUpdatedException) when (attempt < MaxSourceNotUpdatedAttempts)
+            {
+                // Right after midnight Diyanet may still serve yesterday's content.
+                await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
             }
         }
     }
@@ -38,12 +47,22 @@ public sealed class DiyanetScraper(HttpClient httpClient) : IDiyanetScraper
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
-        return ParseDailyContentJson(json);
+        var todayDayOfYear = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, TurkeyTimeZone).DayOfYear;
+        return ParseDailyContentJson(json, todayDayOfYear);
     }
 
-    public static ScrapedAyah ParseDailyContentJson(string json)
+    public static ScrapedAyah ParseDailyContentJson(string json, int? expectedDayOfYear = null)
     {
         using var document = JsonDocument.Parse(json);
+        if (expectedDayOfYear is not null &&
+            document.RootElement.TryGetProperty("dayOfYear", out var dayOfYear) &&
+            dayOfYear.ValueKind == JsonValueKind.Number &&
+            dayOfYear.GetInt32() != expectedDayOfYear)
+        {
+            throw new SourceNotUpdatedException(
+                $"Daily content is for day {dayOfYear.GetInt32()}, expected {expectedDayOfYear}.");
+        }
+
         if (!document.RootElement.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array)
         {
             throw new InvalidOperationException("Daily content JSON has no 'items' array.");

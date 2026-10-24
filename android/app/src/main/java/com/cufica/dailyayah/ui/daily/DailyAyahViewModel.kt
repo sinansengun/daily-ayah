@@ -35,11 +35,11 @@ class DailyAyahViewModel @Inject constructor(
         refresh()
     }
 
-    fun refresh() {
+    fun refresh(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             mutableUiState.value = mutableUiState.value.copy(isLoading = true, errorMessage = null)
-            val ayah = repository.refreshNow()
-            val history = repository.loadHistory(HISTORY_DAYS)
+            val ayah = repository.loadPreferredAyah(forceRefresh)
+            val history = repository.loadHistory(HISTORY_DAYS, forceRefresh)
             ayah?.let {
                 DailyAyahWidgetProvider.requestRefresh(context)
                 DailyAyahOnlyWidgetProvider.requestRefresh(context)

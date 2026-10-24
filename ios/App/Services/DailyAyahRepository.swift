@@ -19,8 +19,12 @@ final class DailyAyahRepository: DailyAyahProviding {
         self.store = store
     }
 
-    // Source priority: fresh API -> shared cache -> last successful.
+    // Source priority: today's cache -> fresh API -> shared cache -> last successful.
     func loadPreferredAyah() async -> DailyAyah? {
+        if let cached = cachedAyahForToday() {
+            return cached
+        }
+
         if let fresh = try? await client.fetchDailyAyah() {
             store.saveCurrent(fresh)
             if !fresh.isStale {
@@ -38,6 +42,10 @@ final class DailyAyahRepository: DailyAyahProviding {
 
     // Call this from app-side manual refresh actions.
     func refreshNowAndReloadWidget() async -> DailyAyah? {
+        if let cached = cachedAyahForToday() {
+            return cached
+        }
+
         guard let fresh = try? await client.fetchDailyAyah() else {
             return await loadPreferredAyah()
         }
@@ -47,14 +55,16 @@ final class DailyAyahRepository: DailyAyahProviding {
             store.saveLastSuccessful(fresh)
         }
 
-        _ = await loadHistory(days: 15)
-
         notifyWidgetReload()
         return fresh
     }
 
     func loadHistory(days: Int) async -> [DailyAyah] {
         let normalizedDays = min(max(days, 1), 30)
+        let cached = store.loadHistory()
+        if cached.first?.publishedDateTR == Self.todayTR() {
+            return Array(cached.prefix(normalizedDays))
+        }
 
         if let response = try? await client.fetchHistory(days: normalizedDays) {
             let history = response.items.map(DailyAyah.init(historyItem:))
@@ -76,6 +86,20 @@ final class DailyAyahRepository: DailyAyahProviding {
 
         store.saveTafsir(tafsir)
         return tafsir
+    }
+
+    private func cachedAyahForToday() -> DailyAyah? {
+        guard let cached = store.loadCurrent(), cached.publishedDateTR == Self.todayTR() else { return nil }
+        return cached
+    }
+
+    private static func todayTR() -> String {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(identifier: "Europe/Istanbul")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: Date())
     }
 
     private func notifyWidgetReload() {

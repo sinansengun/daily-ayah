@@ -14,6 +14,9 @@ import androidx.core.app.NotificationManagerCompat
 import com.cufica.dailyayah.MainActivity
 import com.cufica.dailyayah.R
 import com.cufica.dailyayah.data.DailyAyahRepository
+import com.cufica.dailyayah.widget.AllInOneWidgetProvider
+import com.cufica.dailyayah.widget.DailyAyahOnlyWidgetProvider
+import com.cufica.dailyayah.widget.DailyAyahWidgetProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +39,11 @@ class DailyAyahNotificationReceiver : BroadcastReceiver() {
                     ayah?.text ?: "Günün ayeti hazırlanıyor.",
                     ayah?.reference ?: "Daily Ayah"
                 )
+                if (ayah != null) {
+                    DailyAyahWidgetProvider.requestRefresh(context)
+                    DailyAyahOnlyWidgetProvider.requestRefresh(context)
+                    AllInOneWidgetProvider.requestRefresh(context)
+                }
             } finally {
                 DailyAyahNotificationScheduler.schedule(context)
                 pendingResult.finish()

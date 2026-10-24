@@ -78,7 +78,7 @@ fun DailyAyahRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     RedesignedDailyAyahScreen(
         uiState = uiState,
-        onRefresh = viewModel::refresh,
+        onRefresh = { viewModel.refresh(forceRefresh = true) },
         onOpenDetail = onOpenDetail,
         onOpenSettings = onOpenSettings
     )

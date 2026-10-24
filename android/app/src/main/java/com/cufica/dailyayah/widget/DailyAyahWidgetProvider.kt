@@ -46,7 +46,7 @@ class DailyAyahWidgetProvider : AppWidgetProvider() {
             )
             val city = DeviceCityResolver.widgetCity(context)
             val ayah = if (cachedOnly) {
-                entryPoint.repository().loadCachedAyah()
+                entryPoint.repository().loadAyahForWidget()
             } else {
                 entryPoint.repository().loadPreferredAyah()
             }

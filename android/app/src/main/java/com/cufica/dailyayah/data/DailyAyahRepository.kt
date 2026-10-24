@@ -8,14 +8,17 @@ import com.cufica.dailyayah.data.model.DailyAyah
 import com.cufica.dailyayah.data.model.TafsirAyah
 import com.cufica.dailyayah.data.remote.DailyAyahClient
 import com.cufica.dailyayah.data.remote.NetworkResult
+import java.time.LocalDate
+import java.time.ZoneId
 import javax.inject.Inject
 import javax.inject.Singleton
 
 interface DailyAyahRepository {
-    suspend fun loadPreferredAyah(): DailyAyah?
+    suspend fun loadPreferredAyah(forceRefresh: Boolean = false): DailyAyah?
     suspend fun loadCachedAyah(): DailyAyah?
+    suspend fun loadAyahForWidget(): DailyAyah?
     suspend fun refreshNow(): DailyAyah?
-    suspend fun loadHistory(days: Int): List<DailyAyah>
+    suspend fun loadHistory(days: Int, forceRefresh: Boolean = false): List<DailyAyah>
     suspend fun loadTafsir(surahNumber: Int, ayahNumber: Int): TafsirAyah?
 }
 
@@ -24,7 +27,11 @@ class DefaultDailyAyahRepository @Inject constructor(
     private val client: DailyAyahClient,
     private val dao: DailyAyahDao
 ) : DailyAyahRepository {
-    override suspend fun loadPreferredAyah(): DailyAyah? {
+    override suspend fun loadPreferredAyah(forceRefresh: Boolean): DailyAyah? {
+        if (!forceRefresh) {
+            loadCurrent()?.takeIf { it.publishedDateTR == todayTR() }?.let { return it }
+        }
+
         val etag = dao.cacheReference(CURRENT_KEY)?.etag
         return when (val result = client.fetchDailyAyah(etag)) {
             is NetworkResult.Success -> saveCurrent(result.value, result.etag)
@@ -33,12 +40,31 @@ class DefaultDailyAyahRepository @Inject constructor(
         }
     }
 
-    override suspend fun refreshNow(): DailyAyah? = loadPreferredAyah()
+    override suspend fun refreshNow(): DailyAyah? = loadPreferredAyah(forceRefresh = true)
 
     override suspend fun loadCachedAyah(): DailyAyah? = loadCurrent() ?: loadLastSuccessful()
 
-    override suspend fun loadHistory(days: Int): List<DailyAyah> {
+    @Volatile
+    private var lastWidgetFetchMillis = 0L
+
+    // Widgets tick every minute; only hit the network when the cache is from a previous day, and throttle retries.
+    override suspend fun loadAyahForWidget(): DailyAyah? {
+        val cached = loadCurrent()
+        if (cached?.publishedDateTR == todayTR()) return cached
+
+        val now = System.currentTimeMillis()
+        if (now - lastWidgetFetchMillis < WIDGET_FETCH_INTERVAL_MILLIS) return cached ?: loadLastSuccessful()
+        lastWidgetFetchMillis = now
+        return loadPreferredAyah()
+    }
+
+    override suspend fun loadHistory(days: Int, forceRefresh: Boolean): List<DailyAyah> {
         val normalizedDays = days.coerceIn(1, 30)
+        if (!forceRefresh) {
+            val cached = dao.history(normalizedDays).map { it.toModel() }
+            if (cached.firstOrNull()?.publishedDateTR == todayTR()) return cached
+        }
+
         return when (val result = client.fetchHistory(normalizedDays)) {
             is NetworkResult.Success -> {
                 val items = result.value.items
@@ -83,5 +109,8 @@ class DefaultDailyAyahRepository @Inject constructor(
         const val CURRENT_KEY = "current"
         const val LAST_SUCCESSFUL_KEY = "last_successful"
         const val HISTORY_PREFIX = "history-"
+        const val WIDGET_FETCH_INTERVAL_MILLIS = 15 * 60 * 1000L
+
+        fun todayTR(): String = LocalDate.now(ZoneId.of("Europe/Istanbul")).toString()
     }
 }

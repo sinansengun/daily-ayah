@@ -37,7 +37,7 @@ class AllInOneWidgetProvider : AppWidgetProvider() {
                 RepositoryEntryPoint::class.java
             )
             val city = DeviceCityResolver.widgetCity(context)
-            val ayah = if (cachedOnly) entryPoint.repository().loadCachedAyah() else entryPoint.repository().loadPreferredAyah()
+            val ayah = if (cachedOnly) entryPoint.repository().loadAyahForWidget() else entryPoint.repository().loadPreferredAyah()
             val prayerTimesRepository = entryPoint.prayerTimesRepository()
             val times = if (cachedOnly) prayerTimesRepository.loadCached(city) ?: prayerTimesRepository.load(city) else prayerTimesRepository.load(city)
             AllInOneWidgetUpdater.update(context, ayah, times, ZikirmatikWidgetUpdater.storedState(context))

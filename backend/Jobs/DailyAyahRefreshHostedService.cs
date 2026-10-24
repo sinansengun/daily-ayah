@@ -57,15 +57,11 @@ public sealed class DailyAyahRefreshHostedService(
     private TimeSpan GetDelayUntilNextRefresh(DateTimeOffset nowUtc)
     {
         var nowTr = TimeZoneInfo.ConvertTime(nowUtc, _turkeyTimeZone);
-        var scheduledToday = new DateTime(nowTr.Year, nowTr.Month, nowTr.Day, 0, 15, 0, DateTimeKind.Unspecified);
+        var runTime = new TimeSpan(0, 1, 0);
+        var runDate = nowTr.TimeOfDay >= runTime ? nowTr.Date.AddDays(1) : nowTr.Date;
+        var scheduled = DateTime.SpecifyKind(runDate + runTime, DateTimeKind.Unspecified);
 
-        if (nowTr.TimeOfDay >= new TimeSpan(0, 15, 0))
-        {
-            var tomorrow = nowTr.Date.AddDays(1);
-            scheduledToday = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 0, 15, 0, DateTimeKind.Unspecified);
-        }
-
-        var nextRunUtc = TimeZoneInfo.ConvertTimeToUtc(scheduledToday, _turkeyTimeZone);
+        var nextRunUtc = TimeZoneInfo.ConvertTimeToUtc(scheduled, _turkeyTimeZone);
         var delay = nextRunUtc - nowUtc.UtcDateTime;
 
         return delay <= TimeSpan.Zero ? TimeSpan.FromMinutes(1) : delay;
