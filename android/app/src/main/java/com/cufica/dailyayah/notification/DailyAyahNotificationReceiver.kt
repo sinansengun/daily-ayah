@@ -37,7 +37,7 @@ class DailyAyahNotificationReceiver : BroadcastReceiver() {
                 DailyAyahNotificationPublisher.show(
                     context,
                     ayah?.text ?: "Günün ayeti hazırlanıyor.",
-                    ayah?.reference ?: "Daily Ayah"
+                    ayah?.reference ?: "Günün Ayeti"
                 )
                 if (ayah != null) {
                     DailyAyahWidgetProvider.requestRefresh(context)

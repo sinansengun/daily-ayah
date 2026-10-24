@@ -94,7 +94,7 @@ object DailyAyahWidgetUpdater {
             if (isTwoRows) 11f else 10f
         )
         setTextViewText(R.id.widget_daily_ayah_text, ayah?.text ?: "Günün ayeti hazırlanıyor.")
-        setTextViewText(R.id.widget_daily_ayah_reference, ayah?.reference ?: "Daily Ayah")
+        setTextViewText(R.id.widget_daily_ayah_reference, ayah?.reference ?: "Günün Ayeti")
         if (nextPrayer == null) {
             setTextViewText(R.id.widget_next_prayer_name, "Vakitler hazırlanıyor")
             setTextViewText(R.id.widget_next_prayer_countdown, "--:-- dk")
@@ -207,7 +207,7 @@ object DailyAyahOnlyWidgetUpdater {
                     if (isTwoRows) 13f else 11f
                 )
                 setTextViewText(R.id.widget_ayah_only_text, ayah?.text ?: "Günün ayeti hazırlanıyor.")
-                setTextViewText(R.id.widget_ayah_only_reference, ayah?.reference ?: "Daily Ayah")
+                setTextViewText(R.id.widget_ayah_only_reference, ayah?.reference ?: "Günün Ayeti")
                 setOnClickPendingIntent(R.id.widget_ayah_only_root, appIntent(context))
                 manager.updateAppWidget(widgetId, this)
             }

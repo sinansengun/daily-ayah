@@ -112,7 +112,7 @@ object AllInOneWidgetUpdater {
                 setTextViewTextSize(R.id.widget_all_zikir_target, TypedValue.COMPLEX_UNIT_SP, if (isTwoRows) 12f else 10f)
                 setViewVisibility(R.id.widget_all_zikir_target, if (isTwoRows) View.VISIBLE else View.GONE)
                 setTextViewText(R.id.widget_all_ayah, ayah?.text ?: "Günün ayeti hazırlanıyor.")
-                setTextViewText(R.id.widget_all_reference, ayah?.reference ?: "Daily Ayah")
+                setTextViewText(R.id.widget_all_reference, ayah?.reference ?: "Günün Ayeti")
                 setTextViewText(R.id.widget_all_prayer_name, nextPrayer?.name ?: "Vakitler hazırlanıyor")
                 setTextViewText(R.id.widget_all_prayer_countdown, nextPrayer?.let(WidgetPrayerCountdown::label) ?: "--:-- dk")
                 setTextViewText(R.id.widget_all_location, times?.city.orEmpty())

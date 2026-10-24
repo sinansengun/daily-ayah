@@ -19,4 +19,8 @@ android/.gradle/
 android/.idea/
 android/build/
 android/app/build/
+android/app/release/
 android/local.properties
+
+# Raw device screenshots (may contain personal info)
+docs/play-store/screenshots/
