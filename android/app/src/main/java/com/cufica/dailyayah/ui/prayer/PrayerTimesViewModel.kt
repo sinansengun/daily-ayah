@@ -1,11 +1,9 @@
 package com.cufica.dailyayah.ui.prayer
 
 import android.content.Context
-import android.location.Address
-import android.location.Geocoder
-import android.location.LocationManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cufica.dailyayah.data.DeviceCityResolver
 import com.cufica.dailyayah.data.PrayerTimesRepository
 import com.cufica.dailyayah.data.model.PrayerTimes
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,9 +16,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.util.Locale
 
 data class PrayerTimesUiState(
     val city: String,
@@ -64,7 +59,7 @@ class PrayerTimesViewModel @Inject constructor(
 
     fun useDeviceLocation() {
         viewModelScope.launch {
-            val city = resolveDeviceCity()
+            val city = DeviceCityResolver.resolve(context)
             if (city == null) {
                 mutableState.value = mutableState.value.copy(error = "Konumdan ilçe bilgisi alınamadı.")
                 return@launch
@@ -75,18 +70,4 @@ class PrayerTimesViewModel @Inject constructor(
             refresh(forceRefresh = true)
         }
     }
-
-    private suspend fun resolveDeviceCity(): String? = withContext(Dispatchers.IO) {
-        val locationManager = context.getSystemService(LocationManager::class.java) ?: return@withContext null
-        val location = sequenceOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
-            .mapNotNull { provider -> runCatching { locationManager.getLastKnownLocation(provider) }.getOrNull() }
-            .maxByOrNull { it.time }
-            ?: return@withContext null
-        val geocoder = Geocoder(context, Locale("tr", "TR"))
-        @Suppress("DEPRECATION")
-        val address = geocoder.getFromLocation(location.latitude, location.longitude, 1)?.firstOrNull()
-        address?.diyanetDistrictName()
-    }
-
-    private fun Address.diyanetDistrictName(): String? = subAdminArea ?: locality ?: adminArea
 }

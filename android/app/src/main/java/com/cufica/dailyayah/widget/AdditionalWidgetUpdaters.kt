@@ -156,9 +156,10 @@ private object WidgetPrayerCountdown {
     }
 
     fun label(nextPrayer: NextPrayer): String {
-        val minutes = Duration.between(ZonedDateTime.now(nextPrayer.dateTime.zone), nextPrayer.dateTime)
-            .toMinutes()
-            .coerceAtLeast(0)
+        val remaining = Duration.between(ZonedDateTime.now(nextPrayer.dateTime.zone), nextPrayer.dateTime)
+            .coerceAtLeast(Duration.ZERO)
+        if (remaining.seconds < 60) return "${remaining.seconds} sn"
+        val minutes = remaining.toMinutes()
         return "%d:%02d dk".format(minutes / 60, minutes % 60)
     }
 
@@ -170,7 +171,12 @@ private object WidgetPrayerCountdown {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val now = ZonedDateTime.now(prayerDateTime.zone)
-        val refreshAt = minOf(now.withSecond(0).withNano(0).plusMinutes(1), prayerDateTime)
+        val nextTick = if (Duration.between(now, prayerDateTime).seconds <= 60) {
+            now.withNano(0).plusSeconds(1)
+        } else {
+            now.withSecond(0).withNano(0).plusMinutes(1)
+        }
+        val refreshAt = minOf(nextTick, prayerDateTime)
         context.getSystemService(AlarmManager::class.java).setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             refreshAt.toInstant().toEpochMilli(),

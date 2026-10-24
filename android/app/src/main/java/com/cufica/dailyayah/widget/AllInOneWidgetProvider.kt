@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.cufica.dailyayah.data.DeviceCityResolver
 import com.cufica.dailyayah.di.RepositoryEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineScope
@@ -35,9 +36,10 @@ class AllInOneWidgetProvider : AppWidgetProvider() {
                 context.applicationContext,
                 RepositoryEntryPoint::class.java
             )
-            val city = PrayerWidgetPreferences.selectedCity(context)
+            val city = DeviceCityResolver.widgetCity(context)
             val ayah = if (cachedOnly) entryPoint.repository().loadCachedAyah() else entryPoint.repository().loadPreferredAyah()
-            val times = if (cachedOnly) entryPoint.prayerTimesRepository().loadCached(city) else entryPoint.prayerTimesRepository().load(city)
+            val prayerTimesRepository = entryPoint.prayerTimesRepository()
+            val times = if (cachedOnly) prayerTimesRepository.loadCached(city) ?: prayerTimesRepository.load(city) else prayerTimesRepository.load(city)
             AllInOneWidgetUpdater.update(context, ayah, times, ZikirmatikWidgetUpdater.storedState(context))
             pendingResult.finish()
         }

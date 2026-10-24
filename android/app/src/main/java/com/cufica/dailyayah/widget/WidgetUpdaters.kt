@@ -99,17 +99,18 @@ object DailyAyahWidgetUpdater {
             setTextViewText(R.id.widget_next_prayer_name, "Vakitler hazırlanıyor")
             setTextViewText(R.id.widget_next_prayer_countdown, "--:-- dk")
         } else {
-            val remainingMinutes = Duration.between(
+            val remaining = Duration.between(
                 ZonedDateTime.now(nextPrayer.dateTime.zone),
                 nextPrayer.dateTime
-            ).toMinutes().coerceAtLeast(0)
+            ).coerceAtLeast(Duration.ZERO)
+            val remainingMinutes = remaining.toMinutes()
             setTextViewText(R.id.widget_next_prayer_name, nextPrayer.name)
             setTextViewText(
                 R.id.widget_next_prayer_countdown,
-                if (isTwoRows) {
-                    "%d:%02d dk".format(remainingMinutes / 60, remainingMinutes % 60)
-                } else {
-                    compactCountdownLabel(remainingMinutes)
+                when {
+                    remaining.seconds < 60 -> if (isTwoRows) "${remaining.seconds} sn" else "${remaining.seconds}sn"
+                    isTwoRows -> "%d:%02d dk".format(remainingMinutes / 60, remainingMinutes % 60)
+                    else -> compactCountdownLabel(remainingMinutes)
                 }
             )
         }
@@ -146,8 +147,12 @@ object DailyAyahWidgetUpdater {
         )
         val alarmManager = context.getSystemService(AlarmManager::class.java)
         val now = ZonedDateTime.now(prayerDateTime.zone)
-        val nextMinute = now.withSecond(0).withNano(0).plusMinutes(1)
-        val refreshAt = minOf(nextMinute, prayerDateTime)
+        val nextTick = if (Duration.between(now, prayerDateTime).seconds <= 60) {
+            now.withNano(0).plusSeconds(1)
+        } else {
+            now.withSecond(0).withNano(0).plusMinutes(1)
+        }
+        val refreshAt = minOf(nextTick, prayerDateTime)
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             refreshAt.toInstant().toEpochMilli(),

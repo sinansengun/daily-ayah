@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.os.Bundle
+import com.cufica.dailyayah.data.DeviceCityResolver
 import com.cufica.dailyayah.di.RepositoryEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineScope
@@ -43,16 +44,17 @@ class DailyAyahWidgetProvider : AppWidgetProvider() {
                 context.applicationContext,
                 RepositoryEntryPoint::class.java
             )
-            val city = PrayerWidgetPreferences.selectedCity(context)
+            val city = DeviceCityResolver.widgetCity(context)
             val ayah = if (cachedOnly) {
                 entryPoint.repository().loadCachedAyah()
             } else {
                 entryPoint.repository().loadPreferredAyah()
             }
+            val prayerTimesRepository = entryPoint.prayerTimesRepository()
             val prayerTimes = if (cachedOnly) {
-                entryPoint.prayerTimesRepository().loadCached(city)
+                prayerTimesRepository.loadCached(city) ?: prayerTimesRepository.load(city)
             } else {
-                entryPoint.prayerTimesRepository().load(city)
+                prayerTimesRepository.load(city)
             }
             DailyAyahWidgetUpdater.update(context, ayah, prayerTimes)
             pendingResult.finish()

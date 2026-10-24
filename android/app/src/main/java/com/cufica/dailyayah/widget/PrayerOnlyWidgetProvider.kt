@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.cufica.dailyayah.data.DeviceCityResolver
 import com.cufica.dailyayah.di.RepositoryEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineScope
@@ -35,8 +36,9 @@ class PrayerOnlyWidgetProvider : AppWidgetProvider() {
                 context.applicationContext,
                 RepositoryEntryPoint::class.java
             ).prayerTimesRepository()
-            val city = PrayerWidgetPreferences.selectedCity(context)
-            PrayerOnlyWidgetUpdater.update(context, if (cachedOnly) repository.loadCached(city) else repository.load(city))
+            val city = DeviceCityResolver.widgetCity(context)
+            val times = if (cachedOnly) repository.loadCached(city) ?: repository.load(city) else repository.load(city)
+            PrayerOnlyWidgetUpdater.update(context, times)
             pendingResult.finish()
         }
     }

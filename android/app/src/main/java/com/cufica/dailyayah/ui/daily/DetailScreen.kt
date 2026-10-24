@@ -110,6 +110,17 @@ private fun DetailContent(destination: DetailDestination, tafsir: TafsirAyah) {
                 color = MaterialTheme.colorScheme.secondary
             )
             Text("${tafsir.surahName} Suresi", style = MaterialTheme.typography.headlineLarge)
+            if (destination is DetailDestination.Tafsir) {
+                Text(
+                    if (tafsir.ayahRangeStart != tafsir.ayahRangeEnd) {
+                        "${tafsir.ayahRangeStart}-${tafsir.ayahRangeEnd}. Ayetler"
+                    } else {
+                        "${tafsir.ayahNumber}. Ayet"
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
         }
         if (destination is DetailDestination.Surah) {
             SurahMetadata(tafsir)
