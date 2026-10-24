@@ -12,16 +12,19 @@ public sealed class DailyAyahService
 {
     private readonly IDiyanetScraper _scraper;
     private readonly IDailyAyahRecordStore _store;
+    private readonly ILogger<DailyAyahService> _logger;
     private readonly TimeZoneInfo _turkeyTimeZone;
 
     private DailyAyahRecord? _current;
     private DailyAyahRecord? _lastSuccess;
+    private string? _scrapedDateTR;
     private IReadOnlyList<DailyAyahRecord> _history = [];
 
-    public DailyAyahService(IDiyanetScraper scraper, IDailyAyahRecordStore store)
+    public DailyAyahService(IDiyanetScraper scraper, IDailyAyahRecordStore store, ILogger<DailyAyahService> logger)
     {
         _scraper = scraper;
         _store = store;
+        _logger = logger;
         _turkeyTimeZone = TimeZoneInfo.FindSystemTimeZoneById(AppConstants.TurkeyTimeZone);
     }
 
@@ -64,9 +67,10 @@ public sealed class DailyAyahService
         {
             scraped = await _scraper.FetchDailyAyahAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
         {
-            return GetStaleFallbackOrThrow();
+            _logger.LogError(ex, "Daily ayah scrape failed.");
+            return await ApplyFallbackAsync(todayTR, cancellationToken);
         }
 
         var nowUtc = DateTimeOffset.UtcNow;
@@ -80,7 +84,54 @@ public sealed class DailyAyahService
 
         _current = record;
         _lastSuccess = record;
+        _scrapedDateTR = record.PublishedDateTR;
         UpsertHistory(record);
+
+        return ToApiResponse(record, isStale: false);
+    }
+
+    public bool HasScrapedRecordForToday()
+    {
+        return _scrapedDateTR == GetTurkeyDateIso(DateTimeOffset.UtcNow);
+    }
+
+    private async Task<DailyAyahApiResponse> ApplyFallbackAsync(string todayTR, CancellationToken cancellationToken)
+    {
+        if (_current is not null && _current.PublishedDateTR == todayTR)
+        {
+            _logger.LogWarning("Scrape failed; keeping existing record for {PublishedDateTR} ({Reference}).", todayTR, _current.Reference);
+            return ToApiResponse(_current, isStale: false);
+        }
+
+        var recent = _store.IsConfigured
+            ? await _store.GetHistoryAsync(30, cancellationToken)
+            : _history;
+        var latest = recent.FirstOrDefault();
+        var candidates = recent
+            .Where(record => latest is null || !string.Equals(record.Text, latest.Text, StringComparison.Ordinal))
+            .ToArray();
+        if (candidates.Length == 0)
+        {
+            candidates = recent.ToArray();
+        }
+
+        if (candidates.Length == 0)
+        {
+            _logger.LogError("Daily ayah fallback unavailable: no history records; serving stale data if any.");
+            return GetStaleFallbackOrThrow();
+        }
+
+        var nowUtc = DateTimeOffset.UtcNow;
+        var record = RestampForToday(candidates[Random.Shared.Next(candidates.Length)], nowUtc);
+        await _store.UpsertAsync(record, cancellationToken);
+
+        _current = record;
+        UpsertHistory(record);
+
+        _logger.LogError(
+            "Daily ayah fallback applied for {PublishedDateTR} using {Reference}.",
+            record.PublishedDateTR,
+            record.Reference);
 
         return ToApiResponse(record, isStale: false);
     }
@@ -180,7 +231,11 @@ public sealed class DailyAyahService
             return scrapedRecord;
         }
 
-        var selected = candidates[Random.Shared.Next(candidates.Length)];
+        return RestampForToday(candidates[Random.Shared.Next(candidates.Length)], nowUtc);
+    }
+
+    private DailyAyahRecord RestampForToday(DailyAyahRecord selected, DateTimeOffset nowUtc)
+    {
         var publishedDateTR = GetTurkeyDateIso(nowUtc);
         var fetchedAt = nowUtc.UtcDateTime.ToString("O", CultureInfo.InvariantCulture);
         var fingerprint = $"{selected.Text}|{selected.Reference}|{selected.HadithText ?? string.Empty}|{selected.HadithReference ?? string.Empty}|{selected.DuaText ?? string.Empty}|{selected.DuaReference ?? string.Empty}|{publishedDateTR}";

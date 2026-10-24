@@ -13,6 +13,19 @@ if (int.TryParse(portFromEnv, out var port) && port > 0)
     builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 }
 
+builder.WebHost.UseSentry(options =>
+{
+    if (string.IsNullOrWhiteSpace(options.Dsn))
+    {
+        // Empty DSN disables Sentry (e.g. local runs).
+        options.Dsn = Environment.GetEnvironmentVariable("SENTRY_DSN") ?? string.Empty;
+    }
+
+    // Health checks from Railway would flood performance data.
+    options.TracesSampler = context =>
+        context.TransactionContext.Name.EndsWith("/health", StringComparison.OrdinalIgnoreCase) ? 0.0 : null;
+});
+
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;

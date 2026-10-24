@@ -8,13 +8,20 @@ public sealed class DailyAyahRefreshHostedService(
     ILogger<DailyAyahRefreshHostedService> logger
 ) : BackgroundService
 {
+    private static readonly TimeSpan RetryInterval = TimeSpan.FromHours(1);
     private readonly TimeZoneInfo _turkeyTimeZone = TimeZoneInfo.FindSystemTimeZoneById(AppConstants.TurkeyTimeZone);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        var retrying = !service.HasScrapedRecordForToday();
+
         while (!stoppingToken.IsCancellationRequested)
         {
             var delay = GetDelayUntilNextRefresh(DateTimeOffset.UtcNow);
+            if (retrying && RetryInterval < delay)
+            {
+                delay = RetryInterval;
+            }
             logger.LogInformation("Next daily ayah refresh in {Delay}.", delay);
 
             try
@@ -29,11 +36,20 @@ public sealed class DailyAyahRefreshHostedService(
             try
             {
                 await service.RefreshAsync(force: true, stoppingToken);
-                logger.LogInformation("Daily ayah refreshed by scheduler.");
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
             {
                 logger.LogError(ex, "Scheduled daily ayah refresh failed.");
+            }
+
+            retrying = !service.HasScrapedRecordForToday();
+            if (retrying)
+            {
+                logger.LogWarning("Daily ayah not scraped for today yet; retrying in {RetryInterval}.", RetryInterval);
+            }
+            else
+            {
+                logger.LogInformation("Daily ayah refreshed by scheduler.");
             }
         }
     }

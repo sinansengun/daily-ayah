@@ -1,11 +1,9 @@
-using System.Globalization;
 using System.Net;
-using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using DailyAyah.Api.Abstractions;
 using DailyAyah.Api.Config;
 using DailyAyah.Api.Models;
-using HtmlAgilityPack;
 
 namespace DailyAyah.Api.Scraper;
 
@@ -15,64 +13,74 @@ public sealed class DiyanetScraper(HttpClient httpClient) : IDiyanetScraper
 
     public async Task<ScrapedAyah> FetchDailyAyahAsync(CancellationToken cancellationToken = default)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, AppConstants.DiyanetHomepageUrl);
-        request.Headers.TryAddWithoutValidation("Accept", "text/html");
+        const int maxAttempts = 4;
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                return await FetchDailyContentOnceAsync(cancellationToken);
+            }
+            catch (HttpRequestException) when (attempt < maxAttempts)
+            {
+                // Diyanet intermittently resets connections; retry with backoff.
+                await Task.Delay(TimeSpan.FromSeconds(attempt * 2), cancellationToken);
+            }
+        }
+    }
+
+    private async Task<ScrapedAyah> FetchDailyContentOnceAsync(CancellationToken cancellationToken)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, AppConstants.DiyanetDailyContentUrl);
+        request.Headers.TryAddWithoutValidation("Accept", "application/json");
         request.Headers.TryAddWithoutValidation("User-Agent", "DiyanetDailyAyah/1.0 (+contact: admin@example.com)");
 
         using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        var html = await response.Content.ReadAsStringAsync(cancellationToken);
-        return ParseDailyAyahFromHtml(html);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken);
+        return ParseDailyContentJson(json);
     }
 
-    public static ScrapedAyah ParseDailyAyahFromHtml(string html)
+    public static ScrapedAyah ParseDailyContentJson(string json)
     {
-        var document = new HtmlDocument();
-        document.LoadHtml(html);
-
-        if (TryParseFromAyetBlock(document, out var blockParsed))
+        using var document = JsonDocument.Parse(json);
+        if (!document.RootElement.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array)
         {
-            return blockParsed;
+            throw new InvalidOperationException("Daily content JSON has no 'items' array.");
         }
 
-        var heading = document.DocumentNode
-            .SelectNodes("//h3")?
-            .FirstOrDefault(node => NormalizeForSearch(NormalizeText(node.InnerText)).Contains("gunun ayeti", StringComparison.Ordinal));
-
-        if (heading is null)
+        (string Text, string? Reference)? ayah = null, hadis = null, dua = null;
+        foreach (var item in items.EnumerateArray())
         {
-            throw new InvalidOperationException("Gunun Ayeti heading not found in source HTML.");
+            var code = GetJsonString(item, "contentTypeCode")?.ToLowerInvariant();
+            var text = NormalizeText(GetJsonString(item, "title") ?? string.Empty);
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                continue;
+            }
+
+            var referenceRaw = NormalizeText(GetJsonString(item, "source") ?? string.Empty);
+            var reference = ExtractReference(referenceRaw);
+            if (string.IsNullOrWhiteSpace(reference))
+            {
+                reference = NormalizeText(referenceRaw.Trim('(', ')'));
+            }
+
+            var entry = (text, string.IsNullOrWhiteSpace(reference) ? null : reference);
+            switch (code)
+            {
+                case "ayet": ayah ??= entry; break;
+                case "hadis": hadis ??= entry; break;
+                case "dua": dua ??= entry; break;
+            }
         }
 
-        if (TryParseFromHeading(heading, out var headingParsed))
-        {
-            return headingParsed;
-        }
-
-        throw new InvalidOperationException("Unable to parse daily ayah text/reference from source HTML.");
-    }
-
-    private static bool TryParseFromAyetBlock(HtmlDocument document, out ScrapedAyah parsed)
-    {
-        var ahdContainer = document.DocumentNode.SelectSingleNode("//div[contains(@class,'ayet-hadis-dua')]");
-        if (ahdContainer is null)
-        {
-            parsed = default!;
-            return false;
-        }
-
-        var ayah = ParseAhdSection(ahdContainer, "ayet");
         if (ayah is null || string.IsNullOrWhiteSpace(ayah.Value.Reference))
         {
-            parsed = default!;
-            return false;
+            throw new InvalidOperationException("Daily content JSON has no ayah with a reference.");
         }
 
-        var hadis = ParseAhdSection(ahdContainer, "hadis");
-        var dua = ParseAhdSection(ahdContainer, "dua");
-
-        parsed = new ScrapedAyah(
+        return new ScrapedAyah(
             ayah.Value.Text,
             ayah.Value.Reference!,
             hadis?.Text,
@@ -80,102 +88,13 @@ public sealed class DiyanetScraper(HttpClient httpClient) : IDiyanetScraper
             dua?.Text,
             dua?.Reference
         );
-        return true;
     }
 
-    private static bool TryParseFromHeading(HtmlNode heading, out ScrapedAyah parsed)
+    private static string? GetJsonString(JsonElement element, string name)
     {
-        var verse = string.Empty;
-        var candidateAnchors = heading.SelectNodes("following-sibling::a")?.Take(6) ?? Enumerable.Empty<HtmlNode>();
-
-        foreach (var anchor in candidateAnchors)
-        {
-            var text = NormalizeText(anchor.InnerText);
-            if (string.IsNullOrWhiteSpace(text) || text == "" || text.StartsWith('(') || text.Length < 12)
-            {
-                continue;
-            }
-
-            verse = text;
-            break;
-        }
-
-        var blockTexts = new List<string>();
-        for (var node = heading.NextSibling; node is not null; node = node.NextSibling)
-        {
-            if (node.NodeType != HtmlNodeType.Element)
-            {
-                continue;
-            }
-
-            if (string.Equals(node.Name, "h3", StringComparison.OrdinalIgnoreCase))
-            {
-                break;
-            }
-
-            var text = NormalizeText(node.InnerText);
-            if (!string.IsNullOrWhiteSpace(text) && text != "")
-            {
-                blockTexts.Add(text);
-            }
-        }
-
-        var combined = NormalizeText(string.Join(' ', blockTexts));
-        var reference = ExtractReference(combined);
-
-        if (string.IsNullOrWhiteSpace(verse))
-        {
-            verse = RemoveReference(combined);
-        }
-
-        if (string.IsNullOrWhiteSpace(verse) || string.IsNullOrWhiteSpace(reference))
-        {
-            parsed = default!;
-            return false;
-        }
-
-        parsed = new ScrapedAyah(verse, reference, null, null, null, null);
-        return true;
-    }
-
-    private static (string Text, string? Reference)? ParseAhdSection(HtmlNode container, string sectionClass)
-    {
-        var boxNode = container.SelectSingleNode(
-            $".//div[contains(@class,'ahd-boxes')][.//div[contains(@class,'{sectionClass}')]]"
-        );
-        if (boxNode is null)
-        {
-            return null;
-        }
-
-        var sectionNode = boxNode.SelectSingleNode($".//div[contains(@class,'{sectionClass}')]");
-        if (sectionNode is null)
-        {
-            return null;
-        }
-
-        var textNode = sectionNode.SelectSingleNode(".//p[contains(@class,'ahd-content-text')]");
-        var referenceNode = boxNode.SelectSingleNode(".//div[contains(@class,'aht-bottom')]//p[contains(@class,'alt-sure-title')]");
-
-        var text = NormalizeText(textNode?.InnerText ?? string.Empty);
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return null;
-        }
-
-        var referenceRaw = NormalizeText(referenceNode?.InnerText ?? string.Empty);
-        var reference = ExtractReference(referenceRaw);
-        if (string.IsNullOrWhiteSpace(reference))
-        {
-            reference = NormalizeText(referenceRaw.Trim('(', ')'));
-        }
-
-        if (string.IsNullOrWhiteSpace(reference))
-        {
-            reference = null;
-        }
-
-        return (text, reference);
+        return element.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String
+            ? value.GetString()
+            : null;
     }
 
     private static string NormalizeText(string value)
@@ -193,27 +112,5 @@ public sealed class DiyanetScraper(HttpClient httpClient) : IDiyanetScraper
     {
         var match = ReferenceRegex.Match(text);
         return match.Success ? NormalizeText(match.Groups[1].Value) : string.Empty;
-    }
-
-    private static string RemoveReference(string text)
-    {
-        return NormalizeText(ReferenceRegex.Replace(text, " "));
-    }
-
-    private static string NormalizeForSearch(string value)
-    {
-        var normalized = value.Normalize(NormalizationForm.FormD);
-        var sb = new StringBuilder(normalized.Length);
-
-        foreach (var c in normalized)
-        {
-            var category = CharUnicodeInfo.GetUnicodeCategory(c);
-            if (category != UnicodeCategory.NonSpacingMark)
-            {
-                sb.Append(char.ToLowerInvariant(c));
-            }
-        }
-
-        return sb.ToString().Normalize(NormalizationForm.FormC);
     }
 }
